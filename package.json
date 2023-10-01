@@ -1,0 +1,29 @@
+{
+  "name": "inaba",
+  "version": "1.0.0",
+  "description": "Make HTTP Server everywhere!",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/star-inc/inaba.git"
+  },
+  "author": "Star Inc.",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/star-inc/inaba/issues"
+  },
+  "homepage": "https://github.com/star-inc/inaba#readme",
+  "dependencies": {
+    "toml": "^3.0.0",
+    "uniqid": "^5.4.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

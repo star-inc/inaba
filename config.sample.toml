@@ -1,0 +1,2 @@
+[servers.entrypoint_example_key]
+domains = [ "example.com" ]
