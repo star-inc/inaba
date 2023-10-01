@@ -2,7 +2,7 @@ import uniqid from 'uniqid';
 
 import {
     useSendMessage
-} from './utils.mjs';
+} from '../utils.mjs';
 
 const bottlePool = new Map();
 

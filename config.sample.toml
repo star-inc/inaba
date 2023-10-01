@@ -1,2 +1,9 @@
+hostname = "0.0.0.0"
+port = 8080
+
+domain = "127.0.0.1"
+secure = false
+
 [servers.entrypoint_example_key]
-domains = [ "example.com" ]
+hosts = [ "example.com" ]
+allow_ws = false
