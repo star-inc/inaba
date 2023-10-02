@@ -1,6 +1,5 @@
 # App config files
 config.toml
-tls/
 
 # Finder config file
 .DS_Store

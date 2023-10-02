@@ -1,5 +1,7 @@
 import {
+    head,
     passthrough,
+    exception,
     finish,
 } from './bottle.mjs';
 
@@ -14,8 +16,16 @@ export function onMessage(buffer) {
     const { type, requestId } = data;
 
     switch (type) {
+        case "head": {
+            head(requestId, data);
+            break;
+        }
         case "passthrough": {
             passthrough(requestId, data);
+            break;
+        }
+        case "exception": {
+            exception(requestId, data);
             break;
         }
         case "finish": {

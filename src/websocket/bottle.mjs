@@ -24,11 +24,33 @@ export function register(ws, req, res) {
     })
 }
 
+export function head(requestId, data) {
+    const { statusCode, headers } = data;
+    const { res } = bottlePool.get(requestId);
+
+    if ('content-encoding' in headers) {
+        delete headers['content-encoding'];
+    }
+
+    res.writeHead(statusCode, {
+        ...headers,
+        "x-powered-by": "inaba"
+    });
+}
+
 export function passthrough(requestId, data) {
     const { chunk } = data;
     const buffer = Buffer.from(chunk, "base64");
     const { res } = bottlePool.get(requestId);
     res.write(buffer);
+}
+
+export function exception(requestId, data) {
+    const { text } = data;
+    const { res } = bottlePool.get(requestId);
+    res.write(text)
+    res.end();
+    bottlePool.delete(requestId);
 }
 
 export function finish(requestId) {

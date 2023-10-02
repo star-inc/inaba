@@ -1,30 +1,39 @@
 import {
     createServer as createHttpServer
 } from 'node:http';
-import { 
+import {
     createServer as createHttpsServer
- } from 'node:https';
+} from 'node:https';
 
 import {
     createSecureContext
 } from 'node:tls';
 
 import {
+    readFileSync
+} from 'node:fs';
+
+import {
     useConfig
 } from "../config/index.mjs";
 
-const certsPrefix = new URL("../../tls", import.meta.url);
+import {
+    certsPrefix
+} from "./acme.mjs";
 
-function getCredentials(domain) {
+function getCredentials(serverName) {
+    const certPath = new URL(`${serverName}.crt`, certsPrefix);
+    const keyPath = new URL(`${serverName}.key`, certsPrefix);
     return {
-        cert: new URL(`${domain}.crt`, certsPrefix),
-        key: new URL(`${domain}.key`, certsPrefix),
+        cert: readFileSync(certPath),
+        key: readFileSync(keyPath)
     };
 }
 
-function SNICallback(domain) {
-    const credentials = getCredentials(domain);
-    return createSecureContext(credentials).context;
+function SNICallback(serverName, callback) {
+    const credentials = getCredentials(serverName);
+    const context = createSecureContext(credentials);
+    callback(null, context);
 }
 
 export const useHttp = () => {
@@ -32,8 +41,10 @@ export const useHttp = () => {
 }
 
 export const useHttps = () => {
-    const { domain } = useConfig();
-    const credentials = getCredentials(domain);
+    const { entrypoint } = useConfig();
+    const [hostname] = entrypoint.host.split(":", 1);
+
+    const credentials = getCredentials(hostname);
     const options = {
         ...credentials,
         SNICallback,
