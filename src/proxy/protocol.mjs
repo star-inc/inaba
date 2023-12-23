@@ -18,12 +18,12 @@ import {
 } from "../config/index.mjs";
 
 import {
-    dataPathPrefix
-} from "../utils/acme.mjs";
+    acmePath
+} from "../utils/data.mjs";
 
 function getCredentials(serverName) {
-    const certPath = new URL(`${serverName}.crt`, dataPathPrefix);
-    const keyPath = new URL(`${serverName}.key`, dataPathPrefix);
+    const certPath = new URL(`${serverName}.crt`, acmePath);
+    const keyPath = new URL(`${serverName}.key`, acmePath);
     return {
         cert: readFileSync(certPath),
         key: readFileSync(keyPath)
