@@ -7,8 +7,8 @@ import {
 } from "../config/index.mjs";
 
 import {
-    challengeHandler,
-} from "./acme.mjs";
+    md5hex
+} from "../utils.mjs";
 
 import {
     wsPool,
@@ -20,14 +20,18 @@ import {
 } from '../websocket/bottle.mjs';
 
 export function onRequest(req, res) {
-    if (challengeHandler(req, res)) {
-        res.end();
-        return;
-    }
-
     const { headers } = req;
-    const { entrypoint } = useConfig();
-    if (headers.host === entrypoint.host) {
+
+    const {
+        app_server: appServerConfig
+    } = useConfig();
+
+    const {
+        entrypoint_host: entrypointHost,
+        entrypoint_path: entrypointPath,
+    } = appServerConfig;
+
+    if (headers.host === entrypointHost) {
         res.writeHead(418, {
             'content-type': 'text/html'
         })
@@ -42,10 +46,9 @@ export function onRequest(req, res) {
     }
 
     const { nodes } = useConfig();
-    const profile = Object.entries(nodes).
-        find((i) => i[1].hosts.includes(headers.host));
+    const nodeKey = nodes[headers.host];
 
-    if (!profile) {
+    if (!nodeKey) {
         res.writeHead(512, {
             'content-type': 'text/html'
         })
@@ -57,7 +60,7 @@ export function onRequest(req, res) {
         return;
     }
 
-    if (!wsPool.has(profile[0])) {
+    if (!wsPool.has(nodeKey)) {
         res.writeHead(502, {
             'content-type': 'text/html'
         })
@@ -69,7 +72,7 @@ export function onRequest(req, res) {
         return;
     }
 
-    const ws = wsPool.get(profile[0]);
+    const ws = wsPool.get(nodeKey);
     register(ws, req, res);
 }
 
@@ -78,12 +81,30 @@ export function onUpgrade(req, socket, head) {
 
     const { host } = headers;
     const { pathname } = parseUrl(requestedUrl);
-    const { entrypoint, nodes } = useConfig();
 
-    if (host === entrypoint.host && pathname === entrypoint.path) {
-        const key = req.headers["x-inaba-key"];
+    const {
+        app_server: appServerConfig,
+        nodes,
+    } = useConfig();
 
-        if (!(key in nodes)) {
+    const {
+        entrypoint_host: entrypointHost,
+        entrypoint_path: entrypointPath
+    } = appServerConfig;
+
+    if (host === entrypointHost && pathname === entrypointPath) {
+        const keyRaw = req.headers["x-inaba-key"];
+        if (!keyRaw) {
+            socket.destroy();
+            return;
+        }
+
+        const key = md5hex(keyRaw);
+        const isNodeExists = Object.
+            values(nodes).
+            findIndex((v) => v === key) !== -1;
+
+        if (!isNodeExists) {
             socket.destroy();
             return;
         }

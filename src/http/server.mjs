@@ -4,18 +4,25 @@ import {
 
 import {
   useHttp,
-  useHttps
-} from './protocols.mjs'
+  useHttps,
+} from './protocol.mjs'
 
 import {
   onRequest,
-  onUpgrade
-} from './handlers.mjs';
+  onUpgrade,
+} from './request.mjs';
 
-const config = useConfig();
-export const server = !config.secure ?
+const {
+  app_server: appServerConfig
+} = useConfig();
+
+const {
+  is_secure: isSecure
+} = appServerConfig;
+
+export const appServer = !isSecure ?
   useHttp() :
   useHttps();
 
-server.on('request', onRequest);
-server.on('upgrade', onUpgrade);
+appServer.on('request', onRequest);
+appServer.on('upgrade', onUpgrade);

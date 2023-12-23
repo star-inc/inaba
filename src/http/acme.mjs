@@ -5,6 +5,10 @@ import {
     existsSync
 } from "node:fs";
 import {
+    createServer
+} from "node:http";
+import {
+    readFile,
     writeFile,
 } from "node:fs/promises";
 
@@ -18,19 +22,28 @@ export const renewKeypair = new Map();
 
 export const certsPrefix = new URL("../../ssl_keys/", import.meta.url);
 
-export async function loadCertificate() {
-    const { node } = useConfig();
-    for (const server of node) {
-        const { hosts } = server;
-        for (const host of hosts) {
-            const url = new URL(host);
-            const { hostname: serverName } = url;
+export function checkHostCertificate() {
+    const {
+        app_server: appServerConfig
+    } = useConfig();
 
-            if (!isCertificateExists(serverName)) {
-                issueCertificate(serverName)
-            }
-        }
+    const {
+        node: allNodes
+    } = appServerConfig;
+
+    return allNodes.flatMap((server) => server.hosts
+        .map((host) => new URL(host).hostname)
+        .filter((serverName) => !isCertificateExists(serverName))
+    );
+}
+
+export async function isCSRExists(serverName) {
+    const certPath = new URL(`${serverName}.csr`, certsPrefix);
+    if (!existsSync(certPath)) {
+        return false;
     }
+
+    return true;
 }
 
 export async function isCertificateExists(serverName) {
@@ -47,40 +60,24 @@ export async function isCertificateExists(serverName) {
     return true;
 }
 
-export function challengeHandler(req, res) {
-    const { url: requestedUrl } = req;
-    const { pathname } = parseUrl(requestedUrl);
-
-    const acmePrefix = '/.well-known/acme-challenge/'
-    if (!pathname.startsWith(acmePrefix)) {
-        return false;
-    }
-
-    const key = pathname.slice(acmePrefix.length);
-    if (!renewKeypair.has(key)) {
-        return false;
-    }
-
-    res.write(keypair.get(key));
-    return true;
-}
-
-export async function issueCertificate(acmeClient, serverName) {
-    const [key, csr] = await acme.crypto.createCsr({ serverName });
+export async function getCSR(serverName) {
     const csrPath = new URL(`${serverName}.csr`, certsPrefix);
+    if (existsSync(certsPrefix)) {
+        return await readFile(csrPath);
+    }
 
+    const [key, csr] = await acme.crypto.createCsr({
+        serverName,
+    });
     await Promise.all([
         writeFile(keyPath, key),
         writeFile(csrPath, csr),
     ]);
-    await renewCertificate(
-        acmeClient,
-        serverName,
-        csr,
-    );
+
+    return csr;
 }
 
-export async function renewCertificate(acmeClient, serverName, csr) {
+export async function issueCertificate(acmeClient, csr, serverName) {
     const cert = await acmeClient.auto({
         termsOfServiceAgreed: true,
         challengeCreateFn,
@@ -120,4 +117,28 @@ async function challengeRemoveFn(_authz, challenge, _keyAuthorization) {
         throw new Error("Unsupported challenge type: " + challenge.type);
     }
     renewKeypair.delete(challenge.token);
+}
+
+export async function createChallengeServer() {
+    const server = createServer();
+    server.addListener("request", challengeServerRequestHandler);
+    return server;
+}
+
+export function challengeServerRequestHandler(req, res) {
+    const { url: requestedUrl } = req;
+    const { pathname } = parseUrl(requestedUrl);
+
+    const acmePrefix = '/.well-known/acme-challenge/'
+    if (!pathname.startsWith(acmePrefix)) {
+        return false;
+    }
+
+    const key = pathname.slice(acmePrefix.length);
+    if (!renewKeypair.has(key)) {
+        return false;
+    }
+
+    res.write(keypair.get(key));
+    return true;
 }

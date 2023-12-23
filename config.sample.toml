@@ -1,13 +1,14 @@
-hostname = "0.0.0.0"
-port = 8080
+[app_server]
+is_acme_enabled = false
+entrypoint_host = "localhost"
+entrypoint_path = "/entrypoint"
 
-secure = false
-plain2secure = false
+[acme_provider]
+challenge_type = "http-01"
+ca_provider = "letsencrypt"
+ca_stage = "staging"
+ca_private_key = ""
 
-[entrypoint]
-host = "localhost"
-path = "/entrypoint"
-
-[nodes.entrypoint_example_key]
-hosts = [ "example.com" ]
-allow_ws = false
+[nodes]
+"example.com" = "entrypoint_example_key_md5_001"
+"example.org" = "entrypoint_example_key_md5_002"

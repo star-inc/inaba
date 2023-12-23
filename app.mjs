@@ -5,15 +5,38 @@ import {
 } from "./src/config/index.mjs";
 
 import {
-    server
+    appServer
 } from './src/http/server.mjs';
 
+import {
+    checkHostCertificate,
+} from './src/http/acme.mjs';
+
+import acme from 'acme-client';
+
 const {
-    port: serverPort,
-    hostname: serverHostname
+    app_server: appServerConfig
 } = useConfig();
 
-server.listen(
-    serverPort,
-    serverHostname,
-);
+const {
+    is_acme_enabled: isAcmeSecure,
+} = appServerConfig;
+
+if (isAcmeSecure) {
+    const {
+        ca_provider: provider,
+        ca_stage: stage,
+    } = useConfig();
+
+    const acmeClient = new acme.Client({
+        directoryUrl: acme.directory[provider][stage],
+        accountKey: accountPrivateKey
+    });
+
+    const notReadyHosts = checkHostCertificate(acmeClient);
+    if (notReadyHosts.length) {
+        
+    }
+}
+
+appServer.listen(80);
