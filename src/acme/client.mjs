@@ -73,8 +73,8 @@ export async function issueCertificate(serverName) {
         directoryDataPath,
     } = useClient();
 
-    const timestamp = new Date().getTime();
-    const cert = await client.auto({
+    const certIssueAt = new Date().getTime().toString();
+    const certContent = await client.auto({
         termsOfServiceAgreed: true,
         challengeCreateFn,
         challengeRemoveFn,
@@ -84,8 +84,8 @@ export async function issueCertificate(serverName) {
     const timePath = new URL(`${serverName}.stamp`, directoryDataPath);
     const certPath = new URL(`${serverName}.crt`, directoryDataPath);
     await Promise.all([
-        writeFile(timePath, timestamp),
-        writeFile(certPath, cert),
+        writeFile(timePath, certIssueAt),
+        writeFile(certPath, certContent),
     ]);
 }
 
