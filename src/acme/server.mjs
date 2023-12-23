@@ -43,6 +43,11 @@ export const loadCertificateFiles = () => {
 }
 
 export const loadCertificateRenewals = () => {
+  const {
+    proxy: proxyConfig,
+    node_map: nodeMap,
+  } = useConfig();
+
   const serverNames = [
     proxyConfig.entrypoint_host,
     ...Object.keys(nodeMap),
