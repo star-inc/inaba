@@ -17,10 +17,10 @@ export function checkHostCertificate() {
     } = useConfig();
 
     const {
-        node: allNodes
+        node_map: nodeMap,
     } = proxyServerConfig;
 
-    return allNodes.flatMap((server) => server.hosts
+    return nodeMap.flatMap((server) => server.hosts
         .map((host) => new URL(host).hostname)
         .filter((serverName) => !isCertificateReady(serverName))
     );

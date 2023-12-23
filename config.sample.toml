@@ -9,6 +9,6 @@ ca_provider = "letsencrypt"
 ca_stage = "staging"
 ca_private_key = ""
 
-[nodes]
+[node_map]
 "example.com" = "entrypoint_example_key_md5_001"
 "example.org" = "entrypoint_example_key_md5_002"

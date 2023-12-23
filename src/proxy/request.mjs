@@ -25,7 +25,7 @@ export function onRequest(req, res) {
 
     const {
         proxy_server: proxyServerConfig,
-        nodes
+        node_map: nodeMap,
     } = useConfig();
     const {
         entrypoint_host: entrypointHost,
@@ -45,7 +45,7 @@ export function onRequest(req, res) {
         return;
     }
 
-    const nodeKey = nodes[host];
+    const nodeKey = nodeMap[host];
     if (!nodeKey) {
         res.writeHead(512, {
             'content-type': 'text/html'
@@ -81,7 +81,7 @@ export function onUpgrade(req, socket, head) {
 
     const {
         proxy_server: proxyServerConfig,
-        nodes,
+        node_map: nodeMap,
     } = useConfig();
     const {
         entrypoint_host: entrypointHost,
@@ -97,7 +97,7 @@ export function onUpgrade(req, socket, head) {
 
         const key = md5hex(keyRaw);
         const isNodeExists = Object.
-            values(nodes).
+            values(nodeMap).
             findIndex((v) => v === key) !== -1;
 
         if (!isNodeExists) {

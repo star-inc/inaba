@@ -21,12 +21,12 @@ import {
 export const useServer = () => {
   const {
       proxy_server: proxyServerConfig,
-      nodes,
+      node_map: nodeMap,
   } = useConfig();
 
   const serverNames = [
     proxyServerConfig.entrypoint_host,
-    ...nodes,
+    ...Object.keys(nodeMap),
   ]
   for (const serverName in serverNames) {
       if (!isCertificateReady(serverName)) {
