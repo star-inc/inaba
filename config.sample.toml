@@ -1,9 +1,9 @@
-[app_server]
+[proxy_server]
 is_acme_enabled = false
 entrypoint_host = "localhost"
 entrypoint_path = "/entrypoint"
 
-[acme_provider]
+[acme_server]
 challenge_type = "http-01"
 ca_provider = "letsencrypt"
 ca_stage = "staging"

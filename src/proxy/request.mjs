@@ -8,30 +8,30 @@ import {
 
 import {
     md5hex
-} from "../utils.mjs";
+} from "../utils/native.mjs";
 
 import {
     wsPool,
     wsServer
-} from '../websocket/server.mjs';
+} from '../bottle/server.mjs';
 
 import {
     register,
-} from '../websocket/bottle.mjs';
+} from '../bottle/index.mjs';
 
 export function onRequest(req, res) {
     const { headers } = req;
+    const { host } = headers;
 
     const {
-        app_server: appServerConfig
+        proxy_server: proxyServerConfig,
+        nodes
     } = useConfig();
-
     const {
         entrypoint_host: entrypointHost,
-        entrypoint_path: entrypointPath,
-    } = appServerConfig;
+    } = proxyServerConfig;
 
-    if (headers.host === entrypointHost) {
+    if (host === entrypointHost) {
         res.writeHead(418, {
             'content-type': 'text/html'
         })
@@ -45,15 +45,13 @@ export function onRequest(req, res) {
         return;
     }
 
-    const { nodes } = useConfig();
-    const nodeKey = nodes[headers.host];
-
+    const nodeKey = nodes[host];
     if (!nodeKey) {
         res.writeHead(512, {
             'content-type': 'text/html'
         })
         res.write(`
-            Host \"${headers.host}\"
+            Inaba Proxy: Host \"${host}\"
             is unmanaged by Inaba Network.
         `);
         res.end();
@@ -65,7 +63,7 @@ export function onRequest(req, res) {
             'content-type': 'text/html'
         })
         res.write(`
-            Remote node \"${headers.host}\"
+            Inaba Proxy: Remote node \"${headers.host}\"
             has been disconnected from Inaba Network.
         `);
         res.end();
@@ -78,19 +76,17 @@ export function onRequest(req, res) {
 
 export function onUpgrade(req, socket, head) {
     const { headers, url: requestedUrl } = req;
-
     const { host } = headers;
     const { pathname } = parseUrl(requestedUrl);
 
     const {
-        app_server: appServerConfig,
+        proxy_server: proxyServerConfig,
         nodes,
     } = useConfig();
-
     const {
         entrypoint_host: entrypointHost,
         entrypoint_path: entrypointPath
-    } = appServerConfig;
+    } = proxyServerConfig;
 
     if (host === entrypointHost && pathname === entrypointPath) {
         const keyRaw = req.headers["x-inaba-key"];

@@ -19,7 +19,7 @@ import {
 
 import {
     certsPrefix
-} from "./acme.mjs";
+} from "../utils/acme.mjs";
 
 function getCredentials(serverName) {
     const certPath = new URL(`${serverName}.crt`, certsPrefix);
@@ -41,10 +41,14 @@ export const useHttp = () => {
 }
 
 export const useHttps = () => {
-    const { entrypoint } = useConfig();
-    const [hostname] = entrypoint.host.split(":", 1);
+    const {
+        proxy_server: proxyServerConfig,
+    } = useConfig();
+    const {
+        entrypoint_host: entrypointHost
+    } = proxyServerConfig;
 
-    const credentials = getCredentials(hostname);
+    const credentials = getCredentials(entrypointHost);
     const options = {
         ...credentials,
         SNICallback,

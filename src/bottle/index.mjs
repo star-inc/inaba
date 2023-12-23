@@ -2,7 +2,7 @@ import uniqid from 'uniqid';
 
 import {
     useSendMessage
-} from '../utils.mjs';
+} from '../utils/websocket.mjs';
 
 const bottlePool = new Map();
 
@@ -48,7 +48,7 @@ export function passthrough(requestId, data) {
 export function exception(requestId, data) {
     const { text } = data;
     const { res } = bottlePool.get(requestId);
-    res.write(text)
+    res.write(`Ninja Exception: ${text}`)
     res.end();
     bottlePool.delete(requestId);
 }

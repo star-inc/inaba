@@ -4,7 +4,7 @@ import {
     onPong,
     onMessage,
     onError,
-} from './handler.mjs';
+} from './request.mjs';
 
 export const wsPool = new Map();
 

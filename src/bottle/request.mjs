@@ -3,7 +3,7 @@ import {
     passthrough,
     exception,
     finish,
-} from './bottle.mjs';
+} from './index.mjs';
 
 export function onPong() {
     this.isAlive = true;

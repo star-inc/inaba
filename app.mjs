@@ -1,42 +1,28 @@
 import "./src/config/load.mjs";
 
 import {
-    useConfig
+    useConfig,
 } from "./src/config/index.mjs";
 
 import {
-    appServer
-} from './src/http/server.mjs';
+    useServer as useAcmeServer,
+} from './src/acme/server.mjs';
 
 import {
-    checkHostCertificate,
-} from './src/http/acme.mjs';
-
-import acme from 'acme-client';
+    useServer as useProxyServer,
+} from './src/proxy/server.mjs';
 
 const {
-    app_server: appServerConfig
+    proxy_server: proxyServerConfig,
 } = useConfig();
 
 const {
-    is_acme_enabled: isAcmeSecure,
-} = appServerConfig;
+    is_acme_enabled: isAcmeEnabled,
+} = proxyServerConfig;
 
-if (isAcmeSecure) {
-    const {
-        ca_provider: provider,
-        ca_stage: stage,
-    } = useConfig();
-
-    const acmeClient = new acme.Client({
-        directoryUrl: acme.directory[provider][stage],
-        accountKey: accountPrivateKey
-    });
-
-    const notReadyHosts = checkHostCertificate(acmeClient);
-    if (notReadyHosts.length) {
-        
-    }
+if (!isAcmeEnabled) {
+    useProxyServer(false).listen(80);
+} else {
+    useAcmeServer().listen(80);
+    useProxyServer(true).listen(443);
 }
-
-appServer.listen(80);

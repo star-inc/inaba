@@ -3,9 +3,6 @@ import {
     randomBytes,
 } from "node:crypto";
 
-export const useSendMessage = (ws) =>
-    (data) => ws.send(JSON.stringify(data));
-
 /**
  * Shortcut for hasOwnProperty with safe.
  * @module native
