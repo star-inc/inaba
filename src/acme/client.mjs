@@ -12,6 +12,7 @@ import {
 } from "../config/index.mjs";
 
 import {
+    renewKeypair,
     certsPrefix,
 } from "../utils/acme.mjs";
 import {
