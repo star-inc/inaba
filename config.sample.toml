@@ -4,8 +4,8 @@ entrypoint_host = "localhost"
 entrypoint_path = "/entrypoint"
 
 [acme]
-directory_url = "https://acme-staging-v02.api.letsencrypt.org/"
-account_key = ""
+directory_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
+contact = [] # ["mailto:someone@example.com"]
 
 [node_map]
 "example.com" = "entrypoint_example_key_md5_001"

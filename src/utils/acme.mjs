@@ -7,7 +7,7 @@ export const renewPathPrefix = "/.well-known/acme-challenge/";
 
 export const certsPrefix = new URL("../../ssl_keys/", import.meta.url);
 
-export async function isCertificateReady(serverName) {
+export function isCertificateReady(serverName) {
     const csrPath = new URL(`${serverName}.csr`, certsPrefix);
     if (!existsSync(csrPath)) {
         return false;

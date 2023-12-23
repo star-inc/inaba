@@ -1,5 +1,6 @@
 import {
-    existsSync
+    existsSync,
+    readFileSync,
 } from "node:fs";
 import {
     readFile,
@@ -7,41 +8,55 @@ import {
 } from "node:fs/promises";
 
 import {
-    certsPrefix
-} from "../utils/acme.mjs";
-import {
     useConfig,
 } from "../config/index.mjs";
+
+import {
+    certsPrefix,
+} from "../utils/acme.mjs";
+import {
+    md5hex,
+} from "../utils/native.mjs";
 
 import acme from "acme-client";
 
 export const useClient = () => {
-    const {acme: acmeConfig} = useConfig();
-    return new acme.Client({
-        directoryUrl: acmeConfig.directory_url,
-        accountKey: acmeConfig.account_key
-    })
+    const { acme: acmeConfig } = useConfig();
+
+    const directoryUrl = acmeConfig.directory_url;
+    const directoryUrlMd5 = md5hex(directoryUrl);
+
+    const accountKeyPath = new URL(`account_${directoryUrlMd5}.key`, certsPrefix);
+    const accountKey = readFileSync(accountKeyPath);
+
+    return new acme.Client({ directoryUrl, accountKey });
 }
 
-export async function getCSR(serverName) {
+export async function getKeypair(serverName) {
+    const keyPath = new URL(`${serverName}.key`, certsPrefix);
     const csrPath = new URL(`${serverName}.csr`, certsPrefix);
-    if (existsSync(certsPrefix)) {
-        return await readFile(csrPath);
+    if (existsSync(keyPath) && existsSync(csrPath)) {
+        const [key, csr] = await Promise.all([
+            readFile(keyPath),
+            readFile(csrPath),
+        ]);
+        return { key, csr };
     }
 
     const [key, csr] = await acme.crypto.createCsr({
-        serverName,
+        commonName: serverName,
     });
     await Promise.all([
         writeFile(keyPath, key),
         writeFile(csrPath, csr),
     ]);
 
-    return csr;
+    return { key, csr };
 }
 
 export async function issueCertificate(serverName) {
-    const csr = await getCSR(serverName);
+    const { csr } = await getKeypair(serverName);
+    const client = useClient();
 
     const cert = await client.auto({
         termsOfServiceAgreed: true,
