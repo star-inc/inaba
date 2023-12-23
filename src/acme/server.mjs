@@ -3,7 +3,8 @@ import {
 } from "../config/index.mjs";
 
 import {
-  isCertificateReady
+  isCertificateReady,
+  scheduleCertificateRenewal,
 } from "../utils/acme.mjs";
 
 import {
@@ -24,7 +25,7 @@ export const useServer = () => {
   return server;
 }
 
-export const loadCertificates = () => {
+export const loadCertificateFiles = () => {
   const {
     proxy: proxyConfig,
     node_map: nodeMap,
@@ -40,3 +41,14 @@ export const loadCertificates = () => {
     map((serverName) => issueCertificate(serverName))
   );
 }
+
+export const loadCertificateRenewals = () => {
+  const serverNames = [
+    proxyConfig.entrypoint_host,
+    ...Object.keys(nodeMap),
+  ];
+
+  for (const serverName of serverNames) {
+    scheduleCertificateRenewal(serverName);
+  }
+};

@@ -1,6 +1,15 @@
 import {
-    existsSync
+    existsSync,
+    readFileSync,
 } from "node:fs";
+
+import {
+    scheduleJob
+} from "node-schedule";
+
+import {
+    issueCertificate
+} from "../acme/client.mjs";
 
 import {
     acmePath,
@@ -26,4 +35,15 @@ export function isCertificateReady(serverName) {
     }
 
     return true;
+}
+
+export function scheduleCertificateRenewal(serverName, certIssueAt = -1) {
+    if (certIssueAt === -1) {
+        const timePath = new URL(`${serverName}.stamp`, acmePath);
+        certIssueAt = parseInt(readFileSync(timePath));
+    }
+
+    const expiryDate = new Date(certIssueAt + 5184000000)
+    const expiryHandler = () => issueCertificate(serverName);
+    scheduleJob(expiryDate, expiryHandler,);
 }

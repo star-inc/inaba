@@ -6,7 +6,8 @@ import {
 
 import {
     useServer as useAcmeServer,
-    loadCertificates,
+    loadCertificateFiles,
+    loadCertificateRenewals,
 } from './src/acme/server.mjs';
 
 import {
@@ -31,9 +32,12 @@ if (!isAcmeEnabled) {
     acmeServer.listen(80);
     console.info("[ACME Server] Started.")
 
-    loadCertificates().then(() => {
+    loadCertificateFiles().then(() => {
         const proxy = useProxyServer(true);
         proxy.listen(443);
         console.info("[Proxy Server] Started.")
+    }).then(() => {
+        loadCertificateRenewals();
+        console.info("[ACME Renewal] Started.")
     })
 }
