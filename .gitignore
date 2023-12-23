@@ -11,7 +11,7 @@ openapi_exported.json
 .nyc_output
 coverage
 node_modules
-ssl_keys
+data
 dist
 
 # Log files

@@ -5,6 +5,7 @@ import {
 } from '../utils/websocket.mjs';
 
 const bottlePool = new Map();
+const sessionPool = new Map();
 
 export function register(ws, req, res) {
     const { headers, url: urlPath, method } = req;
@@ -53,8 +54,17 @@ export function exception(requestId, data) {
     bottlePool.delete(requestId);
 }
 
+export function interrupt(sessionId) {
+    const requestIds = sessionPool.get(sessionId);
+    for (const requestId of requestIds) {
+        finish(requestId);
+    }
+}
+
 export function finish(requestId) {
     const { res } = bottlePool.get(requestId);
-    res.end();
+    if (res.end) {
+        res.end();
+    }
     bottlePool.delete(requestId);
 }

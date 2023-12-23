@@ -107,6 +107,7 @@ export function onUpgrade(req, socket, head) {
 
         wsServer.handleUpgrade(req, socket, head, function done(ws) {
             wsServer.emit('connection', ws, req);
+            ws.sessionId = key;
             wsPool.set(key, ws);
         });
         return

@@ -2,6 +2,7 @@ import "./src/config/load.mjs";
 
 import {
     existsSync,
+    mkdirSync,
 } from "node:fs";
 import {
     writeFile,
@@ -12,7 +13,7 @@ import {
 } from "./src/config/index.mjs";
 
 import {
-    certsPrefix
+    dataPathPrefix
 } from "./src/utils/acme.mjs";
 import {
     md5hex,
@@ -25,8 +26,15 @@ import acme from "acme-client";
 
     const directoryUrl = acmeConfig.directory_url;
     const directoryUrlMd5 = md5hex(directoryUrl);
+    const directoryUrlDataPath = new URL(`${directoryUrlMd5}/`, dataPathPrefix);
 
-    const accountKeyPath = new URL(`account_${directoryUrlMd5}.key`, certsPrefix);
+    if (!existsSync(directoryUrlDataPath)) {
+        mkdirSync(directoryUrlDataPath, {
+            recursive: true,
+        })
+    }
+
+    const accountKeyPath = new URL(`account.key`, directoryUrlDataPath);
     if (existsSync(accountKeyPath)) {
         console.error(
             `ACME Account on ${directoryUrl}`,

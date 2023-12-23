@@ -19,6 +19,7 @@
   "homepage": "https://github.com/star-inc/inaba#readme",
   "dependencies": {
     "acme-client": "^5.0.0",
+    "node-schedule": "^2.1.1",
     "toml": "^3.0.0",
     "uniqid": "^5.4.0",
     "ws": "^8.14.2"

@@ -1,5 +1,6 @@
 import {
     existsSync,
+    mkdirSync,
     readFileSync,
 } from "node:fs";
 import {
@@ -13,7 +14,7 @@ import {
 
 import {
     renewKeypair,
-    certsPrefix,
+    dataPathPrefix,
 } from "../utils/acme.mjs";
 import {
     md5hex,
@@ -26,16 +27,26 @@ export const useClient = () => {
 
     const directoryUrl = acmeConfig.directory_url;
     const directoryUrlMd5 = md5hex(directoryUrl);
+    const directoryDataPath = new URL(`${directoryUrlMd5}/`, dataPathPrefix);
 
-    const accountKeyPath = new URL(`account_${directoryUrlMd5}.key`, certsPrefix);
+    const accountKeyPath = new URL(`account.key`, directoryDataPath);
     const accountKey = readFileSync(accountKeyPath);
 
-    return new acme.Client({ directoryUrl, accountKey });
+    const client = new acme.Client({ directoryUrl, accountKey });
+    return {client, directoryDataPath};
 }
 
 export async function getKeypair(serverName) {
-    const keyPath = new URL(`${serverName}.key`, certsPrefix);
-    const csrPath = new URL(`${serverName}.csr`, certsPrefix);
+    const keypairPath = new URL(`keypair/`, dataPathPrefix);
+    if (!existsSync(keypairPath)) {
+        mkdirSync(keypairPath, {
+            recursive: true,
+        })
+    }
+
+    const keyPath = new URL(`${serverName}.key`, keypairPath);
+    const csrPath = new URL(`${serverName}.csr`, keypairPath);
+
     if (existsSync(keyPath) && existsSync(csrPath)) {
         const [key, csr] = await Promise.all([
             readFile(keyPath),
@@ -57,8 +68,12 @@ export async function getKeypair(serverName) {
 
 export async function issueCertificate(serverName) {
     const { csr } = await getKeypair(serverName);
-    const client = useClient();
+    const {
+        client,
+        directoryDataPath,
+    } = useClient();
 
+    const timestamp = new Date().getTime();
     const cert = await client.auto({
         termsOfServiceAgreed: true,
         challengeCreateFn,
@@ -66,8 +81,12 @@ export async function issueCertificate(serverName) {
         csr
     });
 
-    const certPath = new URL(`${serverName}.crt`, certsPrefix)
-    await writeFile(certPath, cert);
+    const timePath = new URL(`${serverName}.stamp`, directoryDataPath);
+    const certPath = new URL(`${serverName}.crt`, directoryDataPath);
+    await Promise.all([
+        writeFile(timePath, timestamp),
+        writeFile(certPath, cert),
+    ]);
 }
 
 /**

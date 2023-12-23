@@ -2,6 +2,7 @@ import {
     head,
     passthrough,
     exception,
+    interrupt,
     finish,
 } from './index.mjs';
 
@@ -36,4 +37,5 @@ export function onMessage(buffer) {
 }
 
 export function onError() {
+    interrupt(this.sessionId);
 }
