@@ -42,11 +42,11 @@ export const useHttp = () => {
 
 export const useHttps = () => {
     const {
-        proxy_server: proxyServerConfig,
+        proxy: proxyConfig,
     } = useConfig();
     const {
         entrypoint_host: entrypointHost
-    } = proxyServerConfig;
+    } = proxyConfig;
 
     const credentials = getCredentials(entrypointHost);
     const options = {

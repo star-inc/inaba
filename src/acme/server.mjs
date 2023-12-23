@@ -19,22 +19,23 @@ import {
 } from './request.mjs';
 
 export const useServer = () => {
-  const {
-      proxy_server: proxyServerConfig,
-      node_map: nodeMap,
-  } = useConfig();
-
-  const serverNames = [
-    proxyServerConfig.entrypoint_host,
-    ...Object.keys(nodeMap),
-  ]
-  for (const serverName in serverNames) {
-      if (!isCertificateReady(serverName)) {
-          issueCertificate(serverName)
-      }
-  }
-
   const server = useHttp();
   server.on('request', onRequest);
   return server;
+}
+
+export const loadCertificates = () => {
+  const {
+    proxy: proxyConfig,
+    node_map: nodeMap,
+  } = useConfig();
+
+  const serverNames = [
+    proxyConfig.entrypoint_host,
+    ...Object.keys(nodeMap),
+  ]
+
+  return Promise.all(serverNames.
+    filter(isCertificateReady).
+    map(issueCertificate))
 }

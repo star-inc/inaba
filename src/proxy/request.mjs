@@ -24,12 +24,12 @@ export function onRequest(req, res) {
     const { host } = headers;
 
     const {
-        proxy_server: proxyServerConfig,
+        proxy: proxyConfig,
         node_map: nodeMap,
     } = useConfig();
     const {
         entrypoint_host: entrypointHost,
-    } = proxyServerConfig;
+    } = proxyConfig;
 
     if (host === entrypointHost) {
         res.writeHead(418, {
@@ -80,13 +80,13 @@ export function onUpgrade(req, socket, head) {
     const { pathname } = parseUrl(requestedUrl);
 
     const {
-        proxy_server: proxyServerConfig,
+        proxy: proxyConfig,
         node_map: nodeMap,
     } = useConfig();
     const {
         entrypoint_host: entrypointHost,
         entrypoint_path: entrypointPath
-    } = proxyServerConfig;
+    } = proxyConfig;
 
     if (host === entrypointHost && pathname === entrypointPath) {
         const keyRaw = req.headers["x-inaba-key"];

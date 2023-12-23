@@ -6,6 +6,7 @@ import {
 
 import {
     useServer as useAcmeServer,
+    loadCertificates,
 } from './src/acme/server.mjs';
 
 import {
@@ -13,16 +14,22 @@ import {
 } from './src/proxy/server.mjs';
 
 const {
-    proxy_server: proxyServerConfig,
+    proxy: proxyConfig,
 } = useConfig();
 
 const {
     is_acme_enabled: isAcmeEnabled,
-} = proxyServerConfig;
+} = proxyConfig;
 
 if (!isAcmeEnabled) {
-    useProxyServer(false).listen(80);
+    const proxy = useProxyServer(false);
+    proxy.listen(80);
 } else {
-    useAcmeServer().listen(80);
-    useProxyServer(true).listen(443);
+    const acmeServer = useAcmeServer();
+    acmeServer.listen(80);
+
+    loadCertificates().then(() => {
+        const proxy = useProxyServer(true);
+        proxy.listen(443);
+    })
 }

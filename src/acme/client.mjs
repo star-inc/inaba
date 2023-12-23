@@ -7,14 +7,19 @@ import {
 } from "node:fs/promises";
 
 import {
+    certsPrefix
+} from "../utils/acme.mjs";
+import {
     useConfig,
 } from "../config/index.mjs";
 
 import acme from "acme-client";
 
 export const useClient = () => {
+    const {acme: acmeConfig} = useConfig();
     return new acme.Client({
-    
+        directoryUrl: acmeConfig.directory_url,
+        accountKey: acmeConfig.account_key
     })
 }
 

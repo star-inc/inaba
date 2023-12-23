@@ -13,12 +13,12 @@ export const certsPrefix = new URL("../../ssl_keys/", import.meta.url);
 
 export function checkHostCertificate() {
     const {
-        proxy_server: proxyServerConfig
+        proxy: proxyConfig
     } = useConfig();
 
     const {
         node_map: nodeMap,
-    } = proxyServerConfig;
+    } = proxyConfig;
 
     return nodeMap.flatMap((server) => server.hosts
         .map((host) => new URL(host).hostname)
