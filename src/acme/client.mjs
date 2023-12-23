@@ -24,11 +24,22 @@ import acme from "acme-client";
 export const useClient = () => {
     const { acme: acmeConfig } = useConfig();
     const directoryUrl = acmeConfig.directory_url;
+    const accountUrl = acmeConfig.account_url;
 
     const accountKeyPath = new URL("account.key", acmePath);
     const accountKey = readFileSync(accountKeyPath);
 
-    return new acme.Client({ directoryUrl, accountKey });
+    const externalAccountBinding = {
+        kid: acmeConfig.eab_kid,
+        hmacKey: acmeConfig.eab_hmac_key,
+    };
+
+    return new acme.Client({
+        directoryUrl,
+        accountUrl,
+        accountKey,
+        externalAccountBinding,
+    });
 }
 
 export async function getKeypair(serverName) {

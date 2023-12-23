@@ -5,7 +5,10 @@ entrypoint_path = "/entrypoint"
 
 [acme]
 directory_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
+account_url = "" # "https://acme-v02.api.letsencrypt.org/acme/acct/12345678"
 contact = [] # ["mailto:someone@example.com"]
+eab_kid = "" # "your_eab_kid"
+eab_hmac_key = "" # "your_eab_hmac_key"
 
 [node_map]
 "example.com" = "entrypoint_example_key_md5_001"
