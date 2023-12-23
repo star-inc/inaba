@@ -20,7 +20,8 @@ export function onRequest(req, res) {
         return;
     }
 
-    const code = pathname.replace(`/^(${renewPathPrefix})/`, "");
+    const renewPathPrefixRegex = new RegExp(`^(${renewPathPrefix})`);
+    const code = pathname.replace(renewPathPrefixRegex, "");
     if (!renewKeypair.has(code)) {
         res.writeHead(404, {
             'content-type': 'text/plain'
