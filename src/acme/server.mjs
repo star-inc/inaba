@@ -33,9 +33,10 @@ export const loadCertificates = () => {
   const serverNames = [
     proxyConfig.entrypoint_host,
     ...Object.keys(nodeMap),
-  ]
+  ];
 
   return Promise.all(serverNames.
-    filter(isCertificateReady).
-    map(issueCertificate))
+    filter((serverName) => !isCertificateReady(serverName)).
+    map((serverName) => issueCertificate(serverName))
+  );
 }
