@@ -40,22 +40,22 @@ export function isCertificateReady(serverName) {
         return false;
     }
 
-    const timestampCurrent = new Date().getTime();
-    const timestampIssueAt = parseInt(readFileSync(stampPath));
-    if (timestampCurrent > timestampIssueAt + renewTime) {
+    const currentTime = new Date().getTime();
+    const certIssueAt = parseInt(readFileSync(stampPath));
+    if (currentTime > certIssueAt + renewTime) {
         return false;
     }
 
     return true;
 }
 
-export function scheduleCertificateRenewal(serverName, timestampIssueAt = -1) {
-    if (timestampIssueAt === -1) {
+export function scheduleCertificateRenewal(serverName, certIssueAt = -1) {
+    if (certIssueAt === -1) {
         const timePath = new URL(`${serverName}.stamp`, acmePath);
-        timestampIssueAt = parseInt(readFileSync(timePath));
+        certIssueAt = parseInt(readFileSync(timePath));
     }
 
-    const expiryDate = new Date(timestampIssueAt + renewTime)
+    const expiryDate = new Date(certIssueAt + renewTime)
     const expiryHandler = async () => {
         console.info(`[ACME Renewal] Issuing certificate for \"${serverName}\".`)
         await issueCertificate(serverName);
