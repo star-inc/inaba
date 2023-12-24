@@ -39,7 +39,7 @@ export const loadCertificateFiles = () => {
   return Promise.all(serverNames.
     filter((serverName) => !isCertificateReady(serverName)).
     map(async (serverName) => {
-      console.info(`[ACME Initialize] Issuing certificate for \"${serverName}\"`);
+      console.info(`[ACME Initialize] Issuing certificate for \"${serverName}\".`);
       await issueCertificate(serverName);
       console.info(`[ACME Initialize] Issued certificate for \"${serverName}\".`);
     })

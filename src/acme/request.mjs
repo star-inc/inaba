@@ -14,7 +14,7 @@ export function onRequest(req, res) {
 
     if (!pathname.startsWith(renewPathPrefix)) {
         res.writeHead(302, {
-            'location': `https://${host}/${pathname}`
+            'location': `https://${host}${pathname}`
         })
         res.write("Inaba ACME: HTTPS redirect automatically.");
         res.end();
@@ -27,7 +27,7 @@ export function onRequest(req, res) {
         res.writeHead(404, {
             'content-type': 'text/plain'
         })
-        res.write("Inaba ACME: Code Not Found");
+        res.write("Inaba ACME: Code is not found.");
         res.end();
         return;
     }

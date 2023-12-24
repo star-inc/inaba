@@ -28,7 +28,7 @@ export function onMessage(buffer) {
         const method = messageMethods[type];
         method.call(this, data);
     } else {
-        console.warn(`[Bottle] Unsupported message type \"${type}\"`)
+        console.warn(`[Bottle] Unsupported message type \"${type}\".`)
     }
 }
 
