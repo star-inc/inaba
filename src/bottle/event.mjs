@@ -26,19 +26,19 @@ export function onMessage(buffer) {
 
     switch (type) {
         case "head": {
-            head(requestId, data);
+            head.call(this, requestId, data);
             break;
         }
         case "passthrough": {
-            passthrough(requestId, data);
+            passthrough.call(this, requestId, data);
             break;
         }
         case "exception": {
-            exception(requestId, data);
+            exception.call(this, requestId, data);
             break;
         }
         case "finish": {
-            finish(requestId);
+            finish.call(this, requestId);
             break;
         }
     }

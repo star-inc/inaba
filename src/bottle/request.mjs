@@ -5,15 +5,19 @@ import {
 } from './server.mjs';
 
 import {
+    finish
+} from './response.mjs';
+
+import {
     useSendMessage
 } from '../utils/websocket.mjs';
 
 export const requestPool = new Map();
 
-export function invokeHttp(ws, req, res) {
+export function invokeHttp(req, res) {
     const { headers, url: urlPath, method } = req;
     const { host: urlHost } = headers;
-    const sendMessage = useSendMessage(ws);
+    const sendMessage = useSendMessage(this);
 
     const urlRaw = new URL(`http://${urlHost}${urlPath}`);
     const url = urlRaw.toString();
@@ -23,9 +27,9 @@ export function invokeHttp(ws, req, res) {
         req, res
     });
 
-    const requestIdsOld = sessionRequests.get(ws.sessionId);
+    const requestIdsOld = sessionRequests.get(this.sessionId);
     const requestIdsNew = [...requestIdsOld, requestId];
-    sessionRequests.set(ws.sessionId, requestIdsNew);
+    sessionRequests.set(this.sessionId, requestIdsNew);
 
     sendMessage({
         type: "register",

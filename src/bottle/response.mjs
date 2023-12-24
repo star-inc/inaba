@@ -42,7 +42,7 @@ export function finish(requestId) {
     }
     requestPool.delete(requestId);
 
-    const requestIdsOld = sessionRequests.get(ws.sessionId);
+    const requestIdsOld = sessionRequests.get(this.sessionId);
     const requestIdsNew = requestIdsOld.filter((i) => i === requestId);
-    sessionRequests.set(ws.sessionId, requestIdsNew);
+    sessionRequests.set(this.sessionId, requestIdsNew);
 }

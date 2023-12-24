@@ -67,7 +67,7 @@ export function onRequest(req, res) {
     }
 
     const ws = sessionPool.get(nodeKey);
-    invokeHttpRequest(ws, req, res);
+    invokeHttpRequest.call(ws, req, res);
 }
 
 export function onUpgrade(req, socket, head) {
