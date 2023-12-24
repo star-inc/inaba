@@ -7,7 +7,8 @@ import {
 } from './index.mjs';
 
 import {
-    wsPool
+    sessionPool,
+    sessionRequests,
 } from './server.mjs';
 
 export function onPong() {
@@ -42,11 +43,14 @@ export function onMessage(buffer) {
 
 export function onError() {
     interrupt(this.sessionId);
-    wsPool.delete(this.sessionId);
-    console.warn(`[Bottle] Session \"${this.sessionId}\" shutdown unexpectedly.`)
+    sessionPool.delete(this.sessionId);
+    sessionRequests.delete(this.sessionId);
+    console.warn(`[Bottle] Session \"${this.sessionId}\" closed unexpectedly.`)
 }
 
 export function onClose() {
     interrupt(this.sessionId);
-    wsPool.delete(this.sessionId);
+    sessionPool.delete(this.sessionId);
+    sessionRequests.delete(this.sessionId);
+    console.info(`[Bottle] Session \"${this.sessionId}\" closed gracefully.`)
 }

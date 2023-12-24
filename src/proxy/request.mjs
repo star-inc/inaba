@@ -11,7 +11,7 @@ import {
 } from "../utils/native.mjs";
 
 import {
-    wsPool,
+    sessionPool,
     wsServer
 } from '../bottle/server.mjs';
 
@@ -55,7 +55,7 @@ export function onRequest(req, res) {
         return;
     }
 
-    if (!wsPool.has(nodeKey)) {
+    if (!sessionPool.has(nodeKey)) {
         res.writeHead(502, {
             'content-type': 'text/plain'
         })
@@ -64,7 +64,7 @@ export function onRequest(req, res) {
         return;
     }
 
-    const ws = wsPool.get(nodeKey);
+    const ws = sessionPool.get(nodeKey);
     register(ws, req, res);
 }
 
@@ -100,9 +100,8 @@ export function onUpgrade(req, socket, head) {
         }
 
         wsServer.handleUpgrade(req, socket, head, function done(ws) {
-            wsServer.emit('connection', ws, req);
             ws.sessionId = key;
-            wsPool.set(key, ws);
+            wsServer.emit('connection', ws, req);
         });
         return
     }

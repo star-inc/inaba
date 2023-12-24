@@ -1,11 +1,14 @@
 import uniqid from 'uniqid';
 
 import {
+    sessionRequests,
+} from './server.mjs';
+
+import {
     useSendMessage
 } from '../utils/websocket.mjs';
 
 const bottlePool = new Map();
-const sessionPool = new Map();
 
 export function register(ws, req, res) {
     const { headers, url: urlPath, method } = req;
@@ -20,8 +23,9 @@ export function register(ws, req, res) {
         req, res
     });
 
-    const requestIds = sessionPool.get(ws.sessionId) || [];
-    sessionPool.set([...requestIds, requestId]);
+    const requestIdsOld = sessionRequests.get(ws.sessionId);
+    const requestIdsNew = [...requestIdsOld, requestId];
+    sessionRequests.set(ws.sessionId, requestIdsNew);
 
     sendMessage({
         type: "register",
@@ -59,7 +63,7 @@ export function exception(requestId, data) {
 }
 
 export function interrupt(sessionId) {
-    const requestIds = sessionPool.get(sessionId);
+    const requestIds = sessionRequests.get(sessionId);
     for (const requestId of requestIds) {
         finish(requestId);
     }
@@ -71,4 +75,8 @@ export function finish(requestId) {
         res.end();
     }
     bottlePool.delete(requestId);
+
+    const requestIdsOld = sessionRequests.get(ws.sessionId);
+    const requestIdsNew = requestIdsOld.filter((i) => i === requestId);
+    sessionRequests.set(ws.sessionId, requestIdsNew);
 }
