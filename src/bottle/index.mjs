@@ -49,7 +49,7 @@ export function passthrough(requestId, data) {
 export function exception(requestId, data) {
     const { text } = data;
     const { res } = bottlePool.get(requestId);
-    res.write(`Ninja Exception: ${text}`)
+    res.write(`Mond Exception: ${text}`)
     res.end();
     bottlePool.delete(requestId);
 }
