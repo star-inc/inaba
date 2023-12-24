@@ -1,3 +1,3 @@
 # Inaba
 
-The tunnel of HTTP services.
+The tunnel server of HTTP services.

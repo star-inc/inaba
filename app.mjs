@@ -22,7 +22,7 @@ const {
     is_acme_enabled: isAcmeEnabled,
 } = proxyConfig;
 
-console.info("Inaba - The tunnel of HTTP services.")
+console.info("Inaba - The tunnel server of HTTP services.")
 if (!isAcmeEnabled) {
     const proxy = useProxyServer(false);
     proxy.listen(80);
