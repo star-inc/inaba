@@ -19,6 +19,10 @@ export function register(ws, req, res) {
     bottlePool.set(requestId, {
         req, res
     });
+
+    const requestIds = sessionPool.get(ws.sessionId);
+    sessionPool.set([...requestIds, requestId]);
+
     sendMessage({
         type: "register",
         requestId, url, method, headers
