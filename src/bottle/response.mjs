@@ -37,12 +37,10 @@ export function exception(requestId, data) {
 
 export function finish(requestId) {
     const { res } = requestPool.get(requestId);
-    if (res.end) {
-        res.end();
-    }
+    res.end();
     requestPool.delete(requestId);
 
     const requestIdsOld = sessionRequests.get(this.sessionId);
-    const requestIdsNew = requestIdsOld.filter((i) => i === requestId);
+    const requestIdsNew = requestIdsOld.filter((i) => i !== requestId);
     sessionRequests.set(this.sessionId, requestIdsNew);
 }
