@@ -6,6 +6,10 @@ import {
     finish,
 } from './index.mjs';
 
+import {
+    wsPool
+} from './server.mjs';
+
 export function onPong() {
     this.isAlive = true;
 }
@@ -38,4 +42,11 @@ export function onMessage(buffer) {
 
 export function onError() {
     interrupt(this.sessionId);
+    wsPool.delete(this.sessionId);
+    console.warn(`[Bottle] Session \"${this.sessionId}\" shutdown unexpectedly.`)
+}
+
+export function onClose() {
+    interrupt(this.sessionId);
+    wsPool.delete(this.sessionId);
 }

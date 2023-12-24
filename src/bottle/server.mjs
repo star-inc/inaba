@@ -4,7 +4,8 @@ import {
     onPong,
     onMessage,
     onError,
-} from './request.mjs';
+    onClose,
+} from './event.mjs';
 
 export const wsPool = new Map();
 
@@ -15,4 +16,5 @@ wsServer.on('connection', function connection(ws) {
     ws.on('pong', onPong);
     ws.on('message', onMessage);
     ws.on('error', onError);
+    ws.on('close', onClose);
 })

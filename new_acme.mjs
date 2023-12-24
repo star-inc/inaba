@@ -41,7 +41,7 @@ import acme from "acme-client";
         });
     }
 
-    console.log(
+    console.info(
         `ACME account on ${acmeConfig.directory_url}`,
         "have been register successfully."
     );
