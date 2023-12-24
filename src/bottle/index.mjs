@@ -20,7 +20,7 @@ export function register(ws, req, res) {
         req, res
     });
 
-    const requestIds = sessionPool.get(ws.sessionId);
+    const requestIds = sessionPool.get(ws.sessionId) || [];
     sessionPool.set([...requestIds, requestId]);
 
     sendMessage({
