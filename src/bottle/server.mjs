@@ -10,9 +10,9 @@ import {
 export const sessionPool = new Map();
 export const sessionRequests = new Map();
 
-export const wsServer = new WebSocketServer({ noServer: true });
+export const bottleServer = new WebSocketServer({ noServer: true });
 
-wsServer.on('connection', function connection(ws) {
+bottleServer.on('connection', function connection(ws) {
     sessionPool.set(ws.sessionId, ws);
     sessionRequests.set(ws.sessionId, []);
     console.info(`[Bottle] Session \"${ws.sessionId}\" connected.`)

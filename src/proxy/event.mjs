@@ -15,7 +15,7 @@ import {
 
 import {
     sessionPool,
-    wsServer
+    bottleServer,
 } from '../bottle/server.mjs';
 import {
     invokeHttp as invokeHttpRequest,
@@ -101,7 +101,7 @@ export function onUpgrade(req, socket, head) {
             return;
         }
 
-        wsServer.handleUpgrade(req, socket, head, function done(ws) {
+        bottleServer.handleUpgrade(req, socket, head, function done(ws) {
             if (sessionPool.has(key)) {
                 const sendMessage = useSendMessage(ws);
                 sendMessage({
@@ -113,7 +113,7 @@ export function onUpgrade(req, socket, head) {
             }
 
             ws.sessionId = key;
-            wsServer.emit('connection', ws, req);
+            bottleServer.emit('connection', ws, req);
         });
         return
     }

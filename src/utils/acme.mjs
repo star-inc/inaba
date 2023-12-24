@@ -44,6 +44,10 @@ export function scheduleCertificateRenewal(serverName, certIssueAt = -1) {
     }
 
     const expiryDate = new Date(certIssueAt + 5184000000)
-    const expiryHandler = () => issueCertificate(serverName);
-    scheduleJob(expiryDate, expiryHandler,);
+    const expiryHandler = async () => {
+        console.info(`[ACME Renewal] Issuing certificate for \"${serverName}\".`)
+        await issueCertificate(serverName);
+        console.info(`[ACME Renewal] Issued certificate for \"${serverName}\".`)
+    }
+    scheduleJob(expiryDate, expiryHandler);
 }

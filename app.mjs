@@ -32,11 +32,11 @@ if (!isAcmeEnabled) {
     acmeServer.listen(80);
     console.info("[ACME Server] Started.")
 
+    const proxy = useProxyServer(true);
+    proxy.listen(443);
+    console.info("[Proxy Server] Started.")
+
     loadCertificateFiles().then(() => {
-        const proxy = useProxyServer(true);
-        proxy.listen(443);
-        console.info("[Proxy Server] Started.")
-    }).then(() => {
         loadCertificateRenewals();
         console.info("[ACME Renewal] Started.")
     })
