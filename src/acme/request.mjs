@@ -8,14 +8,15 @@ import {
 } from "../utils/acme.mjs";
 
 export function onRequest(req, res) {
-    const { url: requestedUrl } = req;
+    const { headers, url: requestedUrl } = req;
+    const { host } = headers;
     const { pathname } = parseUrl(requestedUrl);
 
     if (!pathname.startsWith(renewPathPrefix)) {
-        res.writeHead(400, {
-            'content-type': 'text/plain'
+        res.writeHead(302, {
+            'location': `https://${host}/${pathname}`
         })
-        res.write("Inaba ACME: Bad Request");
+        res.write("Inaba ACME: HTTPS redirect automatically.");
         res.end();
         return;
     }
