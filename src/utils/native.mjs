@@ -22,7 +22,7 @@ export function isObjectPropExists(srcObject, propName) {
  */
 export function randomString(length) {
     const seed = randomBytes(length);
-    return seed.toString("base64");
+    return seed.toString("base64").substring(0, length);
 }
 
 /**
