@@ -15,17 +15,18 @@ import {
 export const requestPool = new Map();
 
 export function invokeHttp(req, res) {
-    const { headers, url: urlPath, method } = req;
+    const { headers, url: urlPath, method, socket } = req;
     const { host: urlHost } = headers;
+    const { remoteAddress } = socket;
     const sendMessage = useSendMessage(this);
 
     const urlRaw = new URL(`http://${urlHost}${urlPath}`);
     const url = urlRaw.toString();
 
+    headers["x-forwarded-for"] = remoteAddress;
+
     const requestId = uniqid();
-    requestPool.set(requestId, {
-        req, res
-    });
+    requestPool.set(requestId, {req, res});
 
     const requestIdsOld = sessionRequests.get(this.sessionId);
     const requestIdsNew = [...requestIdsOld, requestId];
