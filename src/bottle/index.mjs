@@ -34,7 +34,20 @@ export function invokeHttp(req, res) {
     sendMessage({
         type: "httpRequestHead",
         requestId, url, method, headers
-    })
+    });
+    req.on('data', (chunk) => {
+        sendMessage({
+            type: "httpRequestBody",
+            requestId,
+            chunk: chunk.toString('base64'),
+        });
+    });
+    req.on('end', () => {
+        sendMessage({
+            type: "httpRequestFoot",
+            requestId
+        });
+    });
 }
 
 export function revokeAllBySession(sessionId) {
