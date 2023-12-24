@@ -9,15 +9,17 @@ import {
 import {
     md5hex
 } from "../utils/native.mjs";
+import {
+    useSendMessage,
+} from "../utils/websocket.mjs";
 
 import {
     sessionPool,
     wsServer
 } from '../bottle/server.mjs';
-
 import {
-    register,
-} from '../bottle/index.mjs';
+    invokeHttp as invokeHttpRequest,
+} from '../bottle/request.mjs';
 
 export function onRequest(req, res) {
     const { headers } = req;
@@ -65,7 +67,7 @@ export function onRequest(req, res) {
     }
 
     const ws = sessionPool.get(nodeKey);
-    register(ws, req, res);
+    invokeHttpRequest(ws, req, res);
 }
 
 export function onUpgrade(req, socket, head) {
@@ -100,6 +102,16 @@ export function onUpgrade(req, socket, head) {
         }
 
         wsServer.handleUpgrade(req, socket, head, function done(ws) {
+            if (sessionPool.has(key)) {
+                const sendMessage = useSendMessage(ws);
+                sendMessage({
+                    type: 'exception',
+                    text: 'session already exists'
+                });
+                ws.close();
+                return;
+            }
+
             ws.sessionId = key;
             wsServer.emit('connection', ws, req);
         });

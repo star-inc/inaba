@@ -1,10 +1,13 @@
 import {
+    revokeAllBySession
+} from './request.mjs';
+
+import {
     head,
     passthrough,
     exception,
-    interrupt,
     finish,
-} from './index.mjs';
+} from './response.mjs';
 
 import {
     sessionPool,
@@ -42,14 +45,19 @@ export function onMessage(buffer) {
 }
 
 export function onError() {
-    interrupt(this.sessionId);
-    sessionPool.delete(this.sessionId);
-    sessionRequests.delete(this.sessionId);
-    console.warn(`[Bottle] Session \"${this.sessionId}\" closed unexpectedly.`)
+    try {
+        revokeAllBySession(this.sessionId);
+        sessionPool.delete(this.sessionId);
+        sessionRequests.delete(this.sessionId);
+    } catch (e) {
+        console.warn(`[Bottle] Session \"${this.sessionId}\" error handling not working due to \"${e.message}\".`);
+    } finally {
+        console.warn(`[Bottle] Session \"${this.sessionId}\" closed unexpectedly.`);
+    }
 }
 
 export function onClose() {
-    interrupt(this.sessionId);
+    revokeAllBySession(this.sessionId);
     sessionPool.delete(this.sessionId);
     sessionRequests.delete(this.sessionId);
     console.info(`[Bottle] Session \"${this.sessionId}\" closed gracefully.`)

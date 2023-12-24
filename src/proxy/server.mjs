@@ -6,7 +6,7 @@ import {
 import {
   onRequest,
   onUpgrade,
-} from './request.mjs';
+} from './event.mjs';
 
 export const useServer = (isHTTPS) => {
   const server = !isHTTPS ?
