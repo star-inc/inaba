@@ -33,10 +33,12 @@ export function httpResponseBody(data) {
 
 export function httpResponseFoot(data) {
     const { requestId } = data;
-    const { res } = requestPool.get(requestId);
 
-    res.end();
-    requestPool.delete(requestId);
+    if (requestPool.has(requestId)) {
+        const { res } = requestPool.get(requestId);
+        res.end();
+        requestPool.delete(requestId);
+    }
 
     const requestIdsOld = sessionRequests.get(this.sessionId);
     const requestIdsNew = requestIdsOld.filter((i) => i !== requestId);
