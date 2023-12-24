@@ -13,7 +13,6 @@ import {
 
 import {
     renewKeypair,
-    scheduleCertificateRenewal,
 } from "../utils/acme.mjs";
 import {
     acmePath,
@@ -84,7 +83,10 @@ export async function issueCertificate(serverName) {
         writeFile(certPath, certContent),
     ]);
 
-    scheduleCertificateRenewal(serverName, certIssueAt);
+    return {
+        certIssueAt,
+        certContent,
+    };
 }
 
 /**
