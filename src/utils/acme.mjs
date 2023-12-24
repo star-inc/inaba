@@ -17,6 +17,7 @@ import {
 
 export const renewKeypair = new Map();
 export const renewPathPrefix = "/.well-known/acme-challenge/";
+export const renewTime = 5184000000;
 
 export function isCertificateReady(serverName) {
     const csrPath = new URL(`${serverName}.csr`, acmePath);
@@ -34,16 +35,27 @@ export function isCertificateReady(serverName) {
         return false;
     }
 
+    const stampPath = new URL(`${serverName}.stamp`, acmePath);
+    if (!existsSync(stampPath)) {
+        return false;
+    }
+
+    const timestampCurrent = new Date().getTime();
+    const timestampIssueAt = parseInt(readFileSync(stampPath));
+    if (timestampCurrent > timestampIssueAt + renewTime) {
+        return false;
+    }
+
     return true;
 }
 
-export function scheduleCertificateRenewal(serverName, certIssueAt = -1) {
-    if (certIssueAt === -1) {
+export function scheduleCertificateRenewal(serverName, timestampIssueAt = -1) {
+    if (timestampIssueAt === -1) {
         const timePath = new URL(`${serverName}.stamp`, acmePath);
-        certIssueAt = parseInt(readFileSync(timePath));
+        timestampIssueAt = parseInt(readFileSync(timePath));
     }
 
-    const expiryDate = new Date(certIssueAt + 5184000000)
+    const expiryDate = new Date(timestampIssueAt + renewTime)
     const expiryHandler = async () => {
         console.info(`[ACME Renewal] Issuing certificate for \"${serverName}\".`)
         await issueCertificate(serverName);
