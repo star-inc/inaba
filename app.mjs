@@ -38,14 +38,15 @@ if (!isAcmeEnabled) {
             const proxy = useProxyServer(true);
             proxy.listen(443);
             console.info("[Proxy Server] Started.")
-        });
-
-    loadCertificateNodes().
-        then(() => {
-            console.info("[ACME Initialize] Loaded.")
         }).
         then(() => {
-            loadCertificateRenewals();
-            console.info("[ACME Renewal] Started.")
-        })
+            loadCertificateNodes().
+                then(() => {
+                    console.info("[ACME Initialize] Loaded.")
+                }).
+                then(() => {
+                    loadCertificateRenewals();
+                    console.info("[ACME Renewal] Started.")
+                })
+        });
 }
