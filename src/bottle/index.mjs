@@ -5,14 +5,13 @@ import {
 } from './server.mjs';
 
 import {
-    finish
-} from './response.mjs';
+    requestPool,
+    httpResponseFoot,
+} from './message.mjs';
 
 import {
     useSendMessage
 } from '../utils/websocket.mjs';
-
-export const requestPool = new Map();
 
 export function invokeHttp(req, res) {
     const { headers, url: urlPath, method, socket } = req;
@@ -33,7 +32,7 @@ export function invokeHttp(req, res) {
     sessionRequests.set(this.sessionId, requestIdsNew);
 
     sendMessage({
-        type: "register",
+        type: "httpRequestHead",
         requestId, url, method, headers
     })
 }
@@ -41,6 +40,6 @@ export function invokeHttp(req, res) {
 export function revokeAllBySession(sessionId) {
     const requestIds = sessionRequests.get(sessionId);
     for (const requestId of requestIds) {
-        finish(requestId);
+        httpResponseFoot.call({sessionId}, {requestId});
     }
 }

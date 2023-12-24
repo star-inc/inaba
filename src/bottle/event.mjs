@@ -1,18 +1,19 @@
 import {
     revokeAllBySession
-} from './request.mjs';
+} from './index.mjs';
 
 import {
-    head,
-    passthrough,
-    exception,
-    finish,
-} from './response.mjs';
+    methods as messageMethods,
+} from './message.mjs';
 
 import {
     sessionPool,
     sessionRequests,
 } from './server.mjs';
+
+import {
+    isObjectPropExists
+} from '../utils/native.mjs';
 
 export function onPong() {
     this.isAlive = true;
@@ -22,25 +23,12 @@ export function onMessage(buffer) {
     const text = buffer.toString();
     const data = JSON.parse(text);
 
-    const { type, requestId } = data;
-
-    switch (type) {
-        case "head": {
-            head.call(this, requestId, data);
-            break;
-        }
-        case "passthrough": {
-            passthrough.call(this, requestId, data);
-            break;
-        }
-        case "exception": {
-            exception.call(this, requestId, data);
-            break;
-        }
-        case "finish": {
-            finish.call(this, requestId);
-            break;
-        }
+    const { type } = data;
+    if (isObjectPropExists(messageMethods, type)) {
+        const method = messageMethods[type];
+        method.call(this, data);
+    } else {
+        console.warn(`[Bottle] Unsupported message type \"${type}\"`)
     }
 }
 

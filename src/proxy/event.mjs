@@ -19,7 +19,7 @@ import {
 } from '../bottle/server.mjs';
 import {
     invokeHttp as invokeHttpRequest,
-} from '../bottle/request.mjs';
+} from '../bottle/index.mjs';
 
 export function onRequest(req, res) {
     const { headers } = req;
