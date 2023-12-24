@@ -48,24 +48,18 @@ export function onRequest(req, res) {
     const nodeKey = nodeMap[host];
     if (!nodeKey) {
         res.writeHead(512, {
-            'content-type': 'text/html'
+            'content-type': 'text/plain'
         })
-        res.write(`
-            Inaba Proxy: Host \"${host}\"
-            is unmanaged by Inaba Network.
-        `);
+        res.write(`Inaba Proxy: Host \"${host}\" is unmanaged by Inaba Network.`);
         res.end();
         return;
     }
 
     if (!wsPool.has(nodeKey)) {
         res.writeHead(502, {
-            'content-type': 'text/html'
+            'content-type': 'text/plain'
         })
-        res.write(`
-            Inaba Proxy: Remote node \"${headers.host}\"
-            has been disconnected from Inaba Network.
-        `);
+        res.write(`Inaba Proxy: Remote node \"${headers.host}\" has been disconnected from Inaba Network.`);
         res.end();
         return;
     }

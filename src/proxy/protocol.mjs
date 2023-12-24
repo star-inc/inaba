@@ -10,7 +10,8 @@ import {
 } from 'node:tls';
 
 import {
-    readFileSync
+    readFileSync,
+    existsSync,
 } from 'node:fs';
 
 import {
@@ -24,6 +25,11 @@ import {
 function getCredentials(serverName) {
     const certPath = new URL(`${serverName}.crt`, acmePath);
     const keyPath = new URL(`${serverName}.key`, acmePath);
+
+    if (!existsSync(certPath) || !existsSync(keys)) {
+        throw new Error(`Inaba Proxy: Credentials for ${serverName} not exist`);
+    }
+
     return {
         cert: readFileSync(certPath),
         key: readFileSync(keyPath)
@@ -31,9 +37,13 @@ function getCredentials(serverName) {
 }
 
 function SNICallback(serverName, callback) {
-    const credentials = getCredentials(serverName);
-    const context = createSecureContext(credentials);
-    callback(null, context);
+    try {
+        const credentials = getCredentials(serverName);
+        const context = createSecureContext(credentials);
+        callback(null, context);
+    } catch (e) {
+        callback(e, null);
+    }
 }
 
 export const useHttp = () => {
@@ -49,10 +59,6 @@ export const useHttps = () => {
     } = proxyConfig;
 
     const credentials = getCredentials(entrypointHost);
-    const options = {
-        ...credentials,
-        SNICallback,
-    }
-
-    return createHttpsServer(options);
+    const serverOptions = { ...credentials, SNICallback }
+    return createHttpsServer(serverOptions);
 }
