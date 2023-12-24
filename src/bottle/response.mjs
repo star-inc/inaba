@@ -2,6 +2,10 @@ import {
     requestPool
 } from "./request.mjs";
 
+import {
+    sessionRequests,
+} from "./server.mjs";
+
 export function head(requestId, data) {
     const { statusCode, headers } = data;
     const { res } = requestPool.get(requestId);
