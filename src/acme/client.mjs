@@ -12,7 +12,7 @@ import {
 } from "../config/index.mjs";
 
 import {
-    renewKeypair,
+    challengeKeypair,
 } from "../utils/acme.mjs";
 import {
     acmePath,
@@ -99,9 +99,9 @@ export async function issueCertificate(serverName) {
  */
 async function challengeCreateFn(_authz, challenge, keyAuthorization) {
     if (challenge.type !== 'http-01') {
-        throw new Error("Unsupported challenge type: " + challenge.type);
+        throw new Error(`unsupported challenge type: \"${challenge.type}\"`);
     }
-    renewKeypair.set(challenge.token, keyAuthorization);
+    challengeKeypair.set(challenge.token, keyAuthorization);
 }
 
 /**
@@ -114,7 +114,7 @@ async function challengeCreateFn(_authz, challenge, keyAuthorization) {
  */
 async function challengeRemoveFn(_authz, challenge, _keyAuthorization) {
     if (challenge.type !== 'http-01') {
-        throw new Error("Unsupported challenge type: " + challenge.type);
+        throw new Error(`unsupported challenge type: \"${challenge.type}\"`);
     }
-    renewKeypair.delete(challenge.token);
+    challengeKeypair.delete(challenge.token);
 }

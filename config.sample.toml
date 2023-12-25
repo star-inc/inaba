@@ -1,7 +1,7 @@
 [proxy]
 is_acme_enabled = false
 entrypoint_host = "localhost"
-entrypoint_path = "/entrypoint"
+entrypoint_path = "/"
 
 [acme]
 directory_url = "https://acme-staging-v02.api.letsencrypt.org/directory"

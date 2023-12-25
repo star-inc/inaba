@@ -3,10 +3,8 @@ import {
   useHttps,
 } from './protocol.mjs'
 
-import {
-  onRequest,
-  onUpgrade,
-} from './event.mjs';
+import onRequest from './events/on_request.mjs';
+import onUpgrade from './events/on_upgrade.mjs';
 
 export const useServer = (isHTTPS) => {
   const server = !isHTTPS ?

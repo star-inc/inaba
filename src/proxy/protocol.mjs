@@ -22,12 +22,12 @@ import {
     acmePath
 } from "../utils/data.mjs";
 
-function getCredentials(serverName) {
+export function getCredentials(serverName) {
     const certPath = new URL(`${serverName}.crt`, acmePath);
     const keyPath = new URL(`${serverName}.key`, acmePath);
 
     if (!existsSync(certPath) || !existsSync(keyPath)) {
-        throw new Error(`Inaba Proxy: Credentials for ${serverName} not exist`);
+        throw new Error(`credentials for ${serverName} not exist`);
     }
 
     return {

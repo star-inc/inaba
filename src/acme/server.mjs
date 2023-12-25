@@ -17,7 +17,7 @@ import {
 
 import {
   onRequest,
-} from './request.mjs';
+} from './events.mjs';
 
 export const useServer = () => {
   const server = useHttp();

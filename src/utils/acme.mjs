@@ -15,9 +15,9 @@ import {
     acmePath,
 } from "./data.mjs";
 
-export const renewKeypair = new Map();
-export const renewPathPrefix = "/.well-known/acme-challenge/";
-export const renewTime = 5184000000;
+export const challengeKeypair = new Map();
+export const challengePathPrefix = "/.well-known/acme-challenge/";
+export const challengeTime = 5184000000;
 
 export function isCertificateReady(serverName) {
     const csrPath = new URL(`${serverName}.csr`, acmePath);
@@ -42,7 +42,7 @@ export function isCertificateReady(serverName) {
 
     const currentTime = new Date().getTime();
     const certIssueAt = parseInt(readFileSync(stampPath));
-    if (currentTime > certIssueAt + renewTime) {
+    if (currentTime > certIssueAt + challengeTime) {
         return false;
     }
 
@@ -55,7 +55,7 @@ export function scheduleCertificateRenewal(serverName, certIssueAt = -1) {
         certIssueAt = parseInt(readFileSync(timePath));
     }
 
-    const expiryDate = new Date(certIssueAt + renewTime)
+    const expiryDate = new Date(certIssueAt + challengeTime)
     const expiryHandler = async () => {
         console.info(`[ACME Renewal] Issuing certificate for node \"${serverName}\".`)
         const {certIssueAt} = await issueCertificate(serverName);

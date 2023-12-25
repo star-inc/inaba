@@ -4,7 +4,7 @@ import {
 
 import {
     methods as messageMethods,
-} from './message.mjs';
+} from './cmds.mjs';
 
 import {
     sessionPool,

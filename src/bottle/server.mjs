@@ -5,7 +5,7 @@ import {
     onMessage,
     onError,
     onClose,
-} from './event.mjs';
+} from './events.mjs';
 
 export const sessionPool = new Map();
 export const sessionRequests = new Map();

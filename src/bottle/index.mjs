@@ -7,13 +7,13 @@ import {
 import {
     requestPool,
     httpResponseFoot,
-} from './message.mjs';
+} from './cmds.mjs';
 
 import {
     useSendMessage
 } from '../utils/websocket.mjs';
 
-export function invokeHttp(req, res) {
+export function relayHttp(req, res) {
     const { headers, url: urlPath, method, socket } = req;
     const { host: urlHost } = headers;
     const { remoteAddress } = socket;
@@ -49,6 +49,8 @@ export function invokeHttp(req, res) {
         });
     });
 }
+
+export function relayWebsocket() {}
 
 export function revokeAllBySession(sessionId) {
     const requestIds = sessionRequests.get(sessionId);
