@@ -65,7 +65,7 @@ routeMap.set("certificate", ({method, req, res}) => {
 
 function relayRunner({ req, res, host }) {
     const { node_map: nodeMap } = useConfig();
-    const nodeKey = nodeMap[host];
+    const [nodeKey] = Object.entries(nodeMap).find(([_, v]) => v === host);
     if (!nodeKey) {
         res.writeHead(512, { 'content-type': 'text/plain' });
         res.write(`Inaba Proxy: Host \"${host}\" is unmanaged by Inaba Network.`);

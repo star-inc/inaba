@@ -60,7 +60,7 @@ export const loadCertificateRenewals = () => {
 
   const serverNames = [
     proxyConfig.entrypoint_host,
-    ...Object.keys(nodeMap),
+    ...Object.values(nodeMap).flat(),
   ];
 
   for (const serverName of serverNames) {
