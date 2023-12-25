@@ -40,7 +40,7 @@ export const loadCertificateProxy = async () => {
 
 export const loadCertificateNodes = () => {
   const { node_map: nodeMap } = useConfig();
-  const serverNames = Object.keys(nodeMap);
+  const serverNames = Object.values(nodeMap).flat();
 
   return Promise.all(serverNames.
     filter((serverName) => !isCertificateReady(serverName)).
