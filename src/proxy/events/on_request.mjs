@@ -51,10 +51,10 @@ routeMap.set("certificate", ({method, req, res}) => {
         const {serverName} = authNode(req);
         const {cert, key} = getCredentials(serverName);
         res.writeHead(200, { 'content-type': 'application/json' });
-        res.write({
+        res.write(JSON.stringify({
             cert: cert.toString(),
             key: key.toString(),
-        });
+        }));
         res.end();
     } catch (e) {
         res.writeHead(400, { 'content-type': 'text/plain' });

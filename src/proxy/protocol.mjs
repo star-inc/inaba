@@ -32,7 +32,7 @@ export function getCredentials(serverName) {
 
     return {
         cert: readFileSync(certPath),
-        key: readFileSync(keyPath)
+        key: readFileSync(keyPath),
     };
 }
 
