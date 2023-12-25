@@ -32,9 +32,9 @@ function bottleExchanger({ req, socket, head }) {
     }
 
     try {
-        const {key} = authNode(req);
+        const {nodeKey} = authNode(req);
         bottleServer.handleUpgrade(req, socket, head, (ws) => {
-            if (sessionPool.has(key)) {
+            if (sessionPool.has(nodeKey)) {
                 const sendMessage = useSendMessage(ws);
                 sendMessage({
                     type: 'exception',
@@ -44,7 +44,7 @@ function bottleExchanger({ req, socket, head }) {
                 return;
             }
     
-            ws.sessionId = key;
+            ws.sessionId = nodeKey;
             bottleServer.emit('connection', ws, req);
         });
     } catch (_) {

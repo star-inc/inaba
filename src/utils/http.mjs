@@ -52,12 +52,11 @@ export function authNode(req) {
 
     const nodeKey = md5hex(nodeKeyRaw);
     const {node_map: nodeMap} = useConfig();
-    if (!isObjectPropExists(nodeMap, nodeKey)) {
-        throw new Error("node key is not found");
+
+    const serverName = Object.entries(nodeMap).find(([_, v]) => v === nodeKey);
+    if (!serverName) {
+        throw new Error("node key is not invalid");
     }
 
-    return {
-        name: nodeMap[nodeKey],
-        key: nodeKey,
-    };
+    return {serverName, nodeKey};
 }

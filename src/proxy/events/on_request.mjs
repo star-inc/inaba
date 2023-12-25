@@ -45,7 +45,7 @@ routeMap.set("certificate", ({method, req, res}) => {
     }
 
     try {
-        const {name: serverName} = authNode(req);
+        const {serverName} = authNode(req);
         const credentials = getCredentials(serverName);
         res.writeHead(200, { 'content-type': 'application/json' });
         res.write(JSON.stringify(credentials));
@@ -68,7 +68,7 @@ function relayRunner({ req, res, host }) {
     }
     if (!sessionPool.has(nodeKey)) {
         res.writeHead(502, { 'content-type': 'text/plain' });
-        res.write(`Inaba Proxy: Remote node \"${headers.host}\" has been disconnected from Inaba Network.`);
+        res.write(`Inaba Proxy: Remote node \"${host}\" has been disconnected from Inaba Network.`);
         res.end();
         return;
     }
