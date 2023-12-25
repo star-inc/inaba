@@ -8,7 +8,7 @@ import {
 } from "../../utils/http.mjs";
 
 import {
-    getCredentials,
+    getCredential,
 } from "../protocol.mjs";
 
 import {
@@ -39,7 +39,7 @@ routeMap.set("", ({ res }) => {
     res.end();
 });
 
-routeMap.set("certificate", ({ method, req, res }) => {
+routeMap.set("certificates", ({ method, req, res }) => {
     if (method !== "GET") {
         res.writeHead(405, { 'content-type': 'text/plain' });
         res.write("Inaba Proxy: Method not allowed.");
@@ -48,13 +48,13 @@ routeMap.set("certificate", ({ method, req, res }) => {
     }
 
     try {
-        const { serverName } = authNode(req);
-        const { cert, key } = getCredentials(serverName);
+        const { serverNames } = authNode(req);
+        const credentials = serverNames.map((sn) => getCredential(sn));
         res.writeHead(200, { 'content-type': 'application/json' });
-        res.write(JSON.stringify({
+        res.write(JSON.stringify(credentials.map((cert, key) => ({
             cert: cert.toString(),
             key: key.toString(),
-        }));
+        }))));
         res.end();
     } catch (e) {
         res.writeHead(400, { 'content-type': 'text/plain' });

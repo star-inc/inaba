@@ -22,7 +22,7 @@ import {
     acmePath
 } from "../utils/data.mjs";
 
-export function getCredentials(serverName) {
+export function getCredential(serverName) {
     const certPath = new URL(`${serverName}.crt`, acmePath);
     const keyPath = new URL(`${serverName}.key`, acmePath);
 
@@ -38,7 +38,7 @@ export function getCredentials(serverName) {
 
 function SNICallback(serverName, callback) {
     try {
-        const credentials = getCredentials(serverName);
+        const credentials = getCredential(serverName);
         const context = createSecureContext(credentials);
         callback(null, context);
     } catch (e) {
@@ -58,7 +58,7 @@ export const useHttps = () => {
         entrypoint_host: entrypointHost
     } = proxyConfig;
 
-    const credentials = getCredentials(entrypointHost);
+    const credentials = getCredential(entrypointHost);
     const serverOptions = { ...credentials, SNICallback }
     return createHttpsServer(serverOptions);
 }
