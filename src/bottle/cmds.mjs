@@ -18,6 +18,9 @@ export function httpResponseHead(data) {
     if ('content-encoding' in headers) {
         delete headers['content-encoding'];
     }
+    if ('content-length' in headers) {
+        delete headers['content-length'];
+    }
 
     headers["x-powered-by"] = "inaba"
 
