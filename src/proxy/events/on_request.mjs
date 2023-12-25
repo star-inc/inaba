@@ -11,6 +11,10 @@ import {
     getCredentials,
 } from "../protocol.mjs";
 
+import {
+    sessionPool
+} from "../../bottle/server.mjs";
+
 const {
     proxy: proxyConfig,
 } = useConfig();
