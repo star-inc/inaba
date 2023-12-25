@@ -11,5 +11,5 @@ eab_kid = "" # "your_eab_kid"
 eab_hmac_key = "" # "your_eab_hmac_key"
 
 [node_map]
-"example.com" = "entrypoint_example_key_md5_001"
-"example.org" = "entrypoint_example_key_md5_002"
+"example.com" = "entrypoint_example_key_001"
+"example.org" = "entrypoint_example_key_002"

@@ -45,12 +45,12 @@ export function useRouter(prefix) {
 }
 
 export function authNode(req) {
-    const nodeKeyRaw = req.headers["x-inaba-key"];
-    if (!nodeKeyRaw) {
-        throw new Error("node key is not provided");
+    const nodeToken = req.headers["x-inaba-token"];
+    if (!nodeToken) {
+        throw new Error("node token is not provided");
     }
 
-    const nodeKey = md5hex(nodeKeyRaw);
+    const nodeKey = md5hex(nodeToken);
     const {node_map: nodeMap} = useConfig();
 
     const serverName = Object.entries(nodeMap).find(([_, v]) => v === nodeKey);
