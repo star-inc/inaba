@@ -39,7 +39,7 @@ routeMap.set("", ({ res }) => {
     res.end();
 });
 
-routeMap.set("certificate", ({method, req, res}) => {
+routeMap.set("certificate", ({ method, req, res }) => {
     if (method !== "GET") {
         res.writeHead(405, { 'content-type': 'text/plain' });
         res.write("Inaba Proxy: Method not allowed.");
@@ -48,8 +48,8 @@ routeMap.set("certificate", ({method, req, res}) => {
     }
 
     try {
-        const {serverName} = authNode(req);
-        const {cert, key} = getCredentials(serverName);
+        const { serverName } = authNode(req);
+        const { cert, key } = getCredentials(serverName);
         res.writeHead(200, { 'content-type': 'application/json' });
         res.write(JSON.stringify({
             cert: cert.toString(),
@@ -65,13 +65,18 @@ routeMap.set("certificate", ({method, req, res}) => {
 
 function relayRunner({ req, res, host }) {
     const { node_map: nodeMap } = useConfig();
-    const [nodeKey] = Object.entries(nodeMap).find(([_, v]) => v === host);
-    if (!nodeKey) {
+
+    const node = Object.
+        entries(nodeMap).
+        find(([_, v]) => v.includes(host));
+    if (!node) {
         res.writeHead(512, { 'content-type': 'text/plain' });
         res.write(`Inaba Proxy: Host \"${host}\" is unmanaged by Inaba Network.`);
         res.end();
         return;
     }
+
+    const [nodeKey] = node;
     if (!sessionPool.has(nodeKey)) {
         res.writeHead(502, { 'content-type': 'text/plain' });
         res.write(`Inaba Proxy: Remote node \"${host}\" has been disconnected from Inaba Network.`);
