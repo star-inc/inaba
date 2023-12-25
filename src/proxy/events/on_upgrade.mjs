@@ -26,7 +26,7 @@ function bottleExchanger({ req, socket, head }) {
     const { pathname } = parseUrl(requestedUrl);
 
     const actualPath = pathname;
-    const expectPath = `${entrypointPath}/exchanger`;
+    const expectPath = `${entrypointPath}exchanger`;
     if (actualPath !== expectPath) {
         socket.destroy();
     }
