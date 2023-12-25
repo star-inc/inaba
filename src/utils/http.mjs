@@ -57,7 +57,7 @@ export function authNode(req) {
     const nodeKey = md5hex(nodeToken);
     const {node_map: nodeMap} = useConfig();
 
-    const serverName = Object.entries(nodeMap).find(([_, v]) => v === nodeKey);
+    const [serverName] = Object.entries(nodeMap).find(([_, v]) => v === nodeKey);
     if (!serverName) {
         throw new Error("node key is not invalid");
     }

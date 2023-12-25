@@ -27,7 +27,7 @@ export function getCredentials(serverName) {
     const keyPath = new URL(`${serverName}.key`, acmePath);
 
     if (!existsSync(certPath) || !existsSync(keyPath)) {
-        throw new Error(`credentials for ${serverName} not exist`);
+        throw new Error(`credential for ${serverName} not exist`);
     }
 
     return {

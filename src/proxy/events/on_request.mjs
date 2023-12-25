@@ -40,7 +40,7 @@ routeMap.set("", ({ res }) => {
 });
 
 routeMap.set("certificate", ({method, req, res}) => {
-    if (method !== "get") {
+    if (method !== "GET") {
         res.writeHead(405, { 'content-type': 'text/plain' });
         res.write("Inaba Proxy: Method not allowed.");
         res.end();
@@ -55,7 +55,7 @@ routeMap.set("certificate", ({method, req, res}) => {
         res.end();
     } catch (e) {
         res.writeHead(400, { 'content-type': 'text/plain' });
-        res.write(`Inaba Proxy: ${e.message}.`);
+        res.write(`Inaba Proxy: \"${e.message}\".`);
         res.end();
     }
 });
