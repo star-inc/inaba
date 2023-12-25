@@ -49,9 +49,10 @@ routeMap.set("certificates", ({ method, req, res }) => {
 
     try {
         const { serverNames } = authNode(req);
-        const credentials = serverNames.map((sn) => getCredential(sn));
+        const credentials = serverNames.map((sn) => ({sn, ...getCredential(sn)}));
         res.writeHead(200, { 'content-type': 'application/json' });
-        res.write(JSON.stringify(credentials.map(({cert, key}) => ({
+        res.write(JSON.stringify(credentials.map(({sn, cert, key}) => ({
+            name: sn,
             cert: cert.toString(),
             key: key.toString(),
         }))));
