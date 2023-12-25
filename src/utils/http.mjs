@@ -3,7 +3,11 @@ import {
 } from "node:url";
 
 import {
-    isObjectPropExists,
+    useConfig,
+} from "../config/index.mjs";
+
+import {
+    md5hex,
 } from "./native.mjs";
 
 export function useRouter(prefix) {
@@ -36,7 +40,7 @@ export function useRouter(prefix) {
             routeMethod({ method, host, path, req, res });
         } catch (e) {
             res.writeHead(500, { 'content-type': 'text/plain' });
-            res.write(`Inaba HTTP: Exception thrown \"${e.message}\"`);
+            res.write(`Inaba HTTP: Resource thrown \"${e.message}\".`);
             res.end();
         }
     };

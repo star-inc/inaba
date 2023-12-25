@@ -7,6 +7,11 @@ import {
 } from "../../config/index.mjs";
 
 import {
+    bottleServer,
+    sessionPool,
+} from "../../bottle/server.mjs";
+
+import {
     authNode,
 } from "../../utils/http.mjs";
 import {
@@ -47,7 +52,8 @@ function bottleExchanger({ req, socket, head }) {
             ws.sessionId = nodeKey;
             bottleServer.emit('connection', ws, req);
         });
-    } catch (_) {
+    } catch (e) {
+        console.warn(`[Proxy Server] Exchanger thrown \"${e.message}\".`);
         socket.destroy();
     }
 }

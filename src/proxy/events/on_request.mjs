@@ -12,6 +12,9 @@ import {
 } from "../protocol.mjs";
 
 import {
+    relayHttp,
+} from "../../bottle/index.mjs";
+import {
     sessionPool
 } from "../../bottle/server.mjs";
 
