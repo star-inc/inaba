@@ -1,36 +1,29 @@
 import uniqid from 'uniqid';
 
 import {
-    sessionRequests
+    sessionPoolTube,
 } from './server.mjs';
-
-import {
-    requestPool,
-    httpResponseFoot,
-} from './cmds.mjs';
 
 import {
     useSendMessage
 } from '../utils/websocket.mjs';
 
-export function relayHttp(req, res) {
+export function relayHttp(nodeSession, req, res) {
     const { headers, url: urlPath, method, socket } = req;
+    const { remoteAddress, encrypted } = socket;
     const { host: urlHost } = headers;
-    const { remoteAddress } = socket;
-    const sendMessage = useSendMessage(this);
+    const urlSheme = encrypted ? "https:": "http:";
 
-    const urlRaw = new URL(`http://${urlHost}${urlPath}`);
+    const urlRaw = new URL(`${urlSheme}//${urlHost}${urlPath}`);
     const url = urlRaw.toString();
 
     headers["x-forwarded-for"] = remoteAddress;
 
     const requestId = uniqid();
-    requestPool.set(requestId, {req, res});
+    const sessionPool = sessionPoolTube.get(nodeSession.nodeKey);
+    sessionPool.set(requestId, {type: "http", req, res});
 
-    const requestIdsOld = sessionRequests.get(this.sessionId);
-    const requestIdsNew = [...requestIdsOld, requestId];
-    sessionRequests.set(this.sessionId, requestIdsNew);
-
+    const sendMessage = useSendMessage(nodeSession);
     sendMessage({
         type: "httpRequestHead",
         requestId, url, method, headers
@@ -50,11 +43,66 @@ export function relayHttp(req, res) {
     });
 }
 
-export function relayWebsocket() {}
+export function relayWebsocket(nodeSession, req, ws) {
+    const { headers, url: urlPath, socket } = req;
+    const { remoteAddress, encrypted } = socket;
+    const { host: urlHost } = headers;
+    const urlSheme = encrypted ? "https:": "http:";
 
-export function revokeAllBySession(sessionId) {
-    const requestIds = sessionRequests.get(sessionId);
-    for (const requestId of requestIds) {
-        httpResponseFoot.call({sessionId}, {requestId});
+    const urlRaw = new URL(`${urlSheme}//${urlHost}${urlPath}`);
+    const url = urlRaw.toString();
+
+    headers["x-forwarded-for"] = remoteAddress;
+
+    const requestId = uniqid();
+    const sessionPool = sessionPoolTube.get(nodeSession.nodeKey);
+    sessionPool.set(requestId, {type: "websocket", req, ws});
+    
+    const sendMessage = useSendMessage(nodeSession);
+    sendMessage({
+        type: "websocketOpen",
+        requestId, url, headers
+    });
+    ws.on('pong', () => {
+        sendMessage({
+            type: "websocketPong",
+            requestId,
+        });
+    });
+    ws.on('message', (chunk, isBinary) => {
+        sendMessage({
+            type: "websocketSend",
+            requestId,
+            chunk: chunk.toString('base64'),
+            isBinary,
+        });
+    });
+    ws.on('close', () => {
+        sendMessage({
+            type: "websocketClose",
+            requestId
+        });
+    });
+}
+
+export function revokeAllBySession(nodeKey) {
+    const requests = sessionPoolTube.get(nodeKey);
+    for (const request of requests.values()) {
+        const {type} = request;
+        switch (type) {
+            case "http": {
+                const {req, res} = request;
+                res.end();
+                break;
+            }
+            case "websocket": {
+                const {ws} = request;
+                ws.terminate();
+                break;
+            }
+            default: {
+                console.warn(`[Bottle] Unsupported request type \"${type}\".`);
+            }
+        }
     }
 }

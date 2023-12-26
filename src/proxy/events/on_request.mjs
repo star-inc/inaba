@@ -15,7 +15,7 @@ import {
     relayHttp,
 } from "../../bottle/index.mjs";
 import {
-    sessionPool
+    sessionPoolNode
 } from "../../bottle/server.mjs";
 
 const {
@@ -78,15 +78,15 @@ function relayRunner({ req, res, host }) {
     }
 
     const [nodeKey] = node;
-    if (!sessionPool.has(nodeKey)) {
+    if (!sessionPoolNode.has(nodeKey)) {
         res.writeHead(502, { 'content-type': 'text/plain' });
         res.write(`Inaba Proxy: Remote node \"${host}\" has been disconnected from Inaba Network.`);
         res.end();
         return;
     }
 
-    const ws = sessionPool.get(nodeKey);
-    relayHttp.call(ws, req, res);
+    const nodeSession = sessionPoolNode.get(nodeKey);
+    relayHttp(nodeSession, req, res);
 }
 
 export default function onRequest(req, res) {

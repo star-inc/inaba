@@ -7,8 +7,8 @@ import {
 } from './cmds.mjs';
 
 import {
-    sessionPool,
-    sessionRequests,
+    sessionPoolNode,
+    sessionPoolTube,
 } from './server.mjs';
 
 import {
@@ -19,12 +19,19 @@ export function onPong() {
     this.isAlive = true;
 }
 
+function isSessionHasRequest(nodeKey, requestId) {
+    const requestIds = sessionPoolTube.get(nodeKey);
+    return requestIds.has(requestId);
+}
+
 export function onMessage(buffer) {
     const text = buffer.toString();
     const data = JSON.parse(text);
 
-    const { type } = data;
-    if (isObjectPropExists(messageMethods, type)) {
+    const { requestId, type } = data;
+    if (!isSessionHasRequest(this.nodeKey, requestId)) {
+        return;
+    } else if (isObjectPropExists(messageMethods, type)) {
         const method = messageMethods[type];
         method.call(this, data);
     } else {
@@ -34,19 +41,19 @@ export function onMessage(buffer) {
 
 export function onError() {
     try {
-        revokeAllBySession(this.sessionId);
-        sessionPool.delete(this.sessionId);
-        sessionRequests.delete(this.sessionId);
+        revokeAllBySession(this.nodeKey);
+        sessionPoolNode.delete(this.nodeKey);
+        sessionPoolTube.delete(this.nodeKey);
     } catch (e) {
-        console.warn(`[Bottle] Session \"${this.sessionId}\" error handling not working due to \"${e.message}\".`);
+        console.warn(`[Bottle] Session \"${this.nodeKey}\" error handling not working due to \"${e.message}\".`);
     } finally {
-        console.warn(`[Bottle] Session \"${this.sessionId}\" closed unexpectedly.`);
+        console.warn(`[Bottle] Session \"${this.nodeKey}\" closed unexpectedly.`);
     }
 }
 
 export function onClose() {
-    revokeAllBySession(this.sessionId);
-    sessionPool.delete(this.sessionId);
-    sessionRequests.delete(this.sessionId);
-    console.info(`[Bottle] Session \"${this.sessionId}\" closed gracefully.`)
+    revokeAllBySession(this.nodeKey);
+    sessionPoolNode.delete(this.nodeKey);
+    sessionPoolTube.delete(this.nodeKey);
+    console.info(`[Bottle] Session \"${this.nodeKey}\" closed gracefully.`)
 }

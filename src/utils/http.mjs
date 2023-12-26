@@ -1,6 +1,9 @@
 import {
     parse as parseUrl
 } from "node:url";
+import {
+    ServerResponse,
+} from "node:http";
 
 import {
     useConfig,
@@ -63,4 +66,10 @@ export function authNode(req) {
     }
 
     return {nodeKey, serverNames};
+}
+
+export function socketToHttpResponse(socket) {
+    const res = new ServerResponse({ method: 'GET' });
+    res.assignSocket(socket);
+    return res;
 }

@@ -7,8 +7,8 @@ import {
     onClose,
 } from './events.mjs';
 
-export const sessionPool = new Map();
-export const sessionRequests = new Map();
+export const sessionPoolNode = new Map();
+export const sessionPoolTube = new Map();
 
 export const bottleServer = new WebSocketServer({ noServer: true });
 export const bottleHeartbeat = setInterval(() => {
@@ -23,9 +23,9 @@ export const bottleHeartbeat = setInterval(() => {
 }, 30000);
 
 bottleServer.on('connection', function connection(ws) {
-    sessionPool.set(ws.sessionId, ws);
-    sessionRequests.set(ws.sessionId, []);
-    console.info(`[Bottle] Session \"${ws.sessionId}\" connected.`)
+    sessionPoolNode.set(ws.nodeKey, ws);
+    sessionPoolTube.set(ws.nodeKey, new Map());
+    console.info(`[Bottle] Session \"${ws.nodeKey}\" connected.`)
 
     ws.isAlive = true;
     ws.on('pong', onPong);

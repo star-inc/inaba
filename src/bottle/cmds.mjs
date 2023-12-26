@@ -1,20 +1,20 @@
 import {
-    sessionRequests,
+    sessionPoolTube,
 } from "./server.mjs";
-
-export const requestPool = new Map();
 
 export const methods = {
     httpResponseHead,
     httpResponseBody,
     httpResponseFoot,
-    exception,
+    httpResponseException,
+    websocketPing,
+    websocketSend,
+    websocketClose,
+    websocketException,
 }
 
 export function httpResponseHead(data) {
     const { requestId, statusCode, headers } = data;
-    const { res } = requestPool.get(requestId);
-
     if ('content-encoding' in headers) {
         delete headers['content-encoding'];
     }
@@ -24,34 +24,62 @@ export function httpResponseHead(data) {
 
     headers["x-powered-by"] = "inaba"
 
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { res } = sessionPool.get(requestId);
     res.writeHead(statusCode, headers);
 }
 
 export function httpResponseBody(data) {
     const { requestId, chunk } = data;
     const buffer = Buffer.from(chunk, "base64");
-    const { res } = requestPool.get(requestId);
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { res } = sessionPool.get(requestId);
     res.write(buffer);
 }
 
 export function httpResponseFoot(data) {
     const { requestId } = data;
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { res } = sessionPool.get(requestId);
 
-    if (requestPool.has(requestId)) {
-        const { res } = requestPool.get(requestId);
-        res.end();
-        requestPool.delete(requestId);
-    }
-
-    const requestIdsOld = sessionRequests.get(this.sessionId);
-    const requestIdsNew = requestIdsOld.filter((i) => i !== requestId);
-    sessionRequests.set(this.sessionId, requestIdsNew);
+    res.end();
+    sessionPool.delete(requestId);
 }
 
-export function exception(data) {
+export function httpResponseException(data) {
     const { requestId, text } = data;
-    const { res } = requestPool.get(requestId);
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { res } = sessionPool.get(requestId);
     res.write(`Mond Exception: ${text}`)
-    res.end();
-    requestPool.delete(requestId);
+}
+
+export function websocketPing(data) {
+    const { requestId } = data;
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { ws } = sessionPool.get(requestId);
+    ws.ping();
+}
+
+export function websocketSend(data) {
+    const { requestId, chunk, isBinary } = data;
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { ws } = sessionPool.get(requestId);
+    const buffer = Buffer.from(chunk, "base64");
+    ws.send(buffer, {binary: isBinary});
+}
+
+export function websocketClose(data) {
+    const { requestId } = data;
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { ws } = sessionPool.get(requestId);
+
+    ws.close();
+    sessionPool.delete(requestId);
+}
+
+export function websocketException(data) {
+    const { requestId, text } = data;
+    const sessionPool = sessionPoolTube.get(this.nodeKey);
+    const { ws } = sessionPool.get(requestId);
+    ws.send(`Mond Exception: ${text}`)
 }
