@@ -20,7 +20,7 @@ export const bottleHeartbeat = setInterval(() => {
         ws.isAlive = false;
         ws.ping();
     });
-}, 30000);
+}, 7000);
 
 bottleServer.on('connection', function connection(ws) {
     sessionPoolNode.set(ws.nodeKey, ws);

@@ -54,10 +54,10 @@ export function httpResponseException(data) {
 }
 
 export function websocketPing(data) {
-    const { requestId } = data;
+    const { requestId, chunk } = data;
     const sessionPool = sessionPoolTube.get(this.nodeKey);
     const { ws } = sessionPool.get(requestId);
-    ws.ping();
+    ws.ping(chunk);
 }
 
 export function websocketSend(data) {

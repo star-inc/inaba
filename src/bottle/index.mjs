@@ -63,10 +63,10 @@ export function relayWebsocket(nodeSession, req, ws) {
         type: "websocketOpen",
         requestId, url, headers
     });
-    ws.on('pong', () => {
+    ws.on('pong', (chunk) => {
         sendMessage({
             type: "websocketPong",
-            requestId,
+            requestId, chunk
         });
     });
     ws.on('message', (chunk, isBinary) => {

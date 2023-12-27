@@ -39,16 +39,8 @@ export function onMessage(buffer) {
     }
 }
 
-export function onError() {
-    try {
-        revokeAllBySession(this.nodeKey);
-        sessionPoolNode.delete(this.nodeKey);
-        sessionPoolTube.delete(this.nodeKey);
-    } catch (e) {
-        console.warn(`[Bottle] Session \"${this.nodeKey}\" error handling not working due to \"${e.message}\".`);
-    } finally {
-        console.warn(`[Bottle] Session \"${this.nodeKey}\" closed unexpectedly.`);
-    }
+export function onError(e) {
+    console.error(`[Bottle] Session \"${this.nodeKey}\" thrown \"${e.message}\".`);
 }
 
 export function onClose() {
