@@ -2,6 +2,7 @@
 is_acme_enabled = false
 entrypoint_host = "localhost"
 entrypoint_path = "/"
+timeout_request = 3000
 
 [acme]
 directory_url = "https://acme-staging-v02.api.letsencrypt.org/directory"

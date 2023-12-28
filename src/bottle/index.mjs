@@ -1,6 +1,10 @@
 import uniqid from 'uniqid';
 
 import {
+    useConfig,
+} from "../config/index.mjs";
+
+import {
     sessionPoolTube,
 } from './server.mjs';
 
@@ -13,6 +17,13 @@ export function relayHttp(nodeSession, req, res) {
     const { remoteAddress, encrypted } = socket;
     const { host: urlHost } = headers;
     const urlSheme = encrypted ? "https:": "http:";
+    
+    const {
+        proxy: proxyConfig,
+    } = useConfig();
+    const {
+        timeout_request: timeoutRequest
+    } = proxyConfig;
 
     const urlRaw = new URL(`${urlSheme}//${urlHost}${urlPath}`);
     const url = urlRaw.toString();
@@ -41,6 +52,13 @@ export function relayHttp(nodeSession, req, res) {
             requestId
         });
     });
+    setTimeout(() => {
+        sendMessage({
+            type: "httpRequestAbort",
+            requestId
+        });
+        res.end();
+    }, timeoutRequest);
 }
 
 export function relayWebsocket(nodeSession, req, ws) {
@@ -85,13 +103,13 @@ export function relayWebsocket(nodeSession, req, ws) {
     });
 }
 
-export function revokeAllBySession(nodeKey) {
+export function killAllTubes(nodeKey) {
     const requests = sessionPoolTube.get(nodeKey);
-    for (const request of requests.values()) {
+    for (const [requestId, request] of requests.entries()) {
         const {type} = request;
         switch (type) {
             case "http": {
-                const {req, res} = request;
+                const {res} = request;
                 res.end();
                 break;
             }
@@ -104,5 +122,6 @@ export function revokeAllBySession(nodeKey) {
                 console.warn(`[Bottle] Unsupported request type \"${type}\".`);
             }
         }
+        request.delete(requestId);
     }
 }

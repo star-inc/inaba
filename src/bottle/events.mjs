@@ -1,5 +1,5 @@
 import {
-    revokeAllBySession
+    killAllTubes
 } from './index.mjs';
 
 import {
@@ -44,7 +44,7 @@ export function onError(e) {
 }
 
 export function onClose() {
-    revokeAllBySession(this.nodeKey);
+    killAllTubes(this.nodeKey);
     sessionPoolNode.delete(this.nodeKey);
     sessionPoolTube.delete(this.nodeKey);
     console.info(`[Bottle] Session \"${this.nodeKey}\" closed gracefully.`)
