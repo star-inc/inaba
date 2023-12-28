@@ -38,11 +38,12 @@ export function httpResponseBody(data) {
 }
 
 export function httpResponseFoot(data) {
-    const { requestId } = data;
+    const { requestId, timeoutId } = data;
     const sessionPool = sessionPoolTube.get(this.nodeKey);
     const { res } = sessionPool.get(requestId);
 
     res.end();
+    clearTimeout(timeoutId);
     sessionPool.delete(requestId);
 }
 
@@ -50,6 +51,7 @@ export function httpResponseException(data) {
     const { requestId, text } = data;
     const sessionPool = sessionPoolTube.get(this.nodeKey);
     const { res } = sessionPool.get(requestId);
+
     res.write(`Mond Exception: ${text}`)
 }
 

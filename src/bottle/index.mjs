@@ -31,8 +31,16 @@ export function relayHttp(nodeSession, req, res) {
     headers["x-forwarded-for"] = remoteAddress;
 
     const requestId = uniqid();
+    const timeoutId = setTimeout(() => {
+        sendMessage({
+            type: "httpRequestAbort",
+            requestId
+        });
+        res.end();
+    }, timeoutRequest);
+
     const sessionPool = sessionPoolTube.get(nodeSession.nodeKey);
-    sessionPool.set(requestId, {type: "http", req, res});
+    sessionPool.set(requestId, {type: "http", req, res, timeoutId});
 
     const sendMessage = useSendMessage(nodeSession);
     sendMessage({
@@ -52,13 +60,6 @@ export function relayHttp(nodeSession, req, res) {
             requestId
         });
     });
-    setTimeout(() => {
-        sendMessage({
-            type: "httpRequestAbort",
-            requestId
-        });
-        res.end();
-    }, timeoutRequest);
 }
 
 export function relayWebsocket(nodeSession, req, ws) {
