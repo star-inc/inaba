@@ -42,8 +42,11 @@ export function httpResponseFoot(data) {
     const sessionPool = sessionPoolTube.get(this.nodeKey);
     const { res } = sessionPool.get(requestId);
 
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+
     res.end();
-    clearTimeout(timeoutId);
     sessionPool.delete(requestId);
 }
 

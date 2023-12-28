@@ -31,13 +31,13 @@ export function relayHttp(nodeSession, req, res) {
     headers["x-forwarded-for"] = remoteAddress;
 
     const requestId = uniqid();
-    const timeoutId = setTimeout(() => {
+    const timeoutId = timeoutRequest ? setTimeout(() => {
         sendMessage({
             type: "httpRequestAbort",
             requestId
         });
         res.end();
-    }, timeoutRequest);
+    }, timeoutRequest) : null;
 
     const sessionPool = sessionPoolTube.get(nodeSession.nodeKey);
     sessionPool.set(requestId, {type: "http", req, res, timeoutId});
