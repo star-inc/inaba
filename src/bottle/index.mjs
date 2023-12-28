@@ -123,6 +123,6 @@ export function killAllTubes(nodeKey) {
                 console.warn(`[Bottle] Unsupported request type \"${type}\".`);
             }
         }
-        request.delete(requestId);
+        requests.delete(requestId);
     }
 }
