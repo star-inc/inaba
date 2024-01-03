@@ -22,7 +22,8 @@ export function httpResponseHead(data) {
         delete headers['content-length'];
     }
 
-    headers["x-powered-by"] = "inaba"
+    headers["x-powered-by"] = "inaba";
+    headers["x-inaba-request-id"] = requestId;
 
     const sessionPool = sessionPoolTube.get(this.nodeKey);
     const { res } = sessionPool.get(requestId);
