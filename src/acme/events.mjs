@@ -30,7 +30,7 @@ export function onRequest(req, res) {
         return;
     }
 
-    const challengeKey = challengeKeypair.get(challengePath);
+    const challengeKey = challengeKeypair.get(challengeToken);
     res.writeHead(200, { 'content-type': 'text/plain' });
     res.write(challengeKey);
     res.end();
