@@ -25,7 +25,7 @@ import acme from "acme-client";
     if (existsSync(accountKeyPath)) {
         console.error(
             `ACME Account on ${directoryUrl}`,
-            "has been register."
+            "had been register."
         )
         return;
     }
@@ -43,6 +43,6 @@ import acme from "acme-client";
 
     console.info(
         `ACME account on ${acmeConfig.directory_url}`,
-        "have been register successfully."
+        "has been register successfully."
     );
 })()
